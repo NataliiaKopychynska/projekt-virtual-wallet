@@ -1,0 +1,402 @@
+/* ─── Layout ─────────────────────────────────────────────────── */
+
+.home {
+  display: flex;
+  min-height: 100vh;
+  background: #101010;
+}
+
+/* ─── Sidebar ─────────────────────────────────────────────────── */
+
+.home__sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #161616;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.25rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.home__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 2.5rem;
+  padding-left: 0.25rem;
+}
+
+.home__brand-icon {
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, #6c63ff, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.home__brand-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fbfbfb;
+  letter-spacing: -0.01em;
+}
+
+.home__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.home__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(251, 251, 251, 0.5);
+  transition: background 0.2s, color 0.2s;
+}
+
+.home__nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fbfbfb;
+}
+
+.home__nav-item--active {
+  background: rgba(108, 99, 255, 0.15);
+  color: #8b84ff;
+}
+
+.home__logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(251, 251, 251, 0.4);
+  transition: background 0.2s, color 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.home__logout-btn:hover {
+  background: rgba(255, 80, 80, 0.1);
+  color: #ff6b6b;
+}
+
+/* ─── Main ────────────────────────────────────────────────────── */
+
+.home__main {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+  max-width: 860px;
+}
+
+/* ─── Top bar ─────────────────────────────────────────────────── */
+
+.home__topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.home__greeting {
+  font-size: 0.875rem;
+  color: rgba(251, 251, 251, 0.45);
+  margin-bottom: 0.125rem;
+}
+
+.home__username {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fbfbfb;
+  letter-spacing: -0.02em;
+}
+
+.home__avatar-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+  border: 2px solid rgba(108, 99, 255, 0.5);
+  transition: border-color 0.2s;
+}
+
+.home__avatar-btn:hover {
+  border-color: #6c63ff;
+}
+
+.home__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home__avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6c63ff, #4ecdc4);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* ─── Balance card ────────────────────────────────────────────── */
+
+.home__balance-card {
+  position: relative;
+  background: linear-gradient(135deg, #6c63ff 0%, #4ecdc4 100%);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.home__balance-card-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.home__balance-label {
+  font-size: 0.813rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.home__balance-amount {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.375rem;
+}
+
+.home__balance-sub {
+  font-size: 0.813rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1.25rem;
+}
+
+.home__balance-chip {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+
+.home__balance-deco {
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+
+.home__balance-deco::after {
+  content: '';
+  position: absolute;
+  right: 40px;
+  bottom: -60px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ─── Sections ────────────────────────────────────────────────── */
+
+.home__section {
+  margin-bottom: 2rem;
+}
+
+.home__section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fbfbfb;
+  margin-bottom: 1rem;
+}
+
+/* ─── Quick actions ───────────────────────────────────────────── */
+
+.home__actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+.home__action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem;
+  background: #1c1c1c;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.home__action-btn:hover {
+  background: #232323;
+  transform: translateY(-2px);
+}
+
+.home__action-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(108, 99, 255, 0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  color: #8b84ff;
+}
+
+.home__action-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(251, 251, 251, 0.6);
+}
+
+/* ─── Transactions ────────────────────────────────────────────── */
+
+.home__transactions {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.home__tx {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #1c1c1c;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  transition: background 0.2s;
+}
+
+.home__tx:hover {
+  background: #222222;
+}
+
+.home__tx-icon-wrap {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+  color: rgba(251, 251, 251, 0.5);
+}
+
+.home__tx-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.home__tx-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fbfbfb;
+}
+
+.home__tx-category {
+  font-size: 0.75rem;
+  color: rgba(251, 251, 251, 0.4);
+}
+
+.home__tx-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+}
+
+.home__tx-amount {
+  font-size: 0.938rem;
+  font-weight: 600;
+}
+
+.home__tx-amount--positive {
+  color: #4ecdc4;
+}
+
+.home__tx-amount--negative {
+  color: #fbfbfb;
+}
+
+.home__tx-date {
+  font-size: 0.75rem;
+  color: rgba(251, 251, 251, 0.35);
+}
+
+/* ─── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .home__sidebar {
+    display: none;
+  }
+
+  .home__main {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .home__balance-amount {
+    font-size: 1.75rem;
+  }
+
+  .home__actions {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+
+  .home__action-btn {
+    padding: 0.75rem 0.25rem;
+  }
+
+  .home__action-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 0.938rem;
+  }
+
+  .home__action-label {
+    font-size: 0.688rem;
+  }
+}
