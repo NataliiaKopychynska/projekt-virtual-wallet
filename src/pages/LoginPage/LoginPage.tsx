@@ -64,7 +64,7 @@ const LoginPage = () => {
                 theme="filled_black"
                 size="large"
                 shape="rectangular"
-                width="100%"
+                width={360}
                 text="signin_with"
               />
             </div>
