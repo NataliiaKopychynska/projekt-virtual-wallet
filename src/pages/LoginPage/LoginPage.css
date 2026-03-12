@@ -121,6 +121,62 @@
   margin-bottom: 0.5rem;
 }
 
+/* ─── Form ───────────────────────────────────────────────────── */
+
+.login-page__form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.login-page__input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fbfbfb;
+  font-family: inherit;
+  font-size: 0.938rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.login-page__input::placeholder {
+  color: rgba(251, 251, 251, 0.35);
+}
+
+.login-page__input:focus {
+  border-color: #6c63ff;
+  background: rgba(108, 99, 255, 0.08);
+}
+
+.login-page__submit-btn {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, #6c63ff 0%, #4ecdc4 100%);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.938rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  margin-top: 0.25rem;
+}
+
+.login-page__submit-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.login-page__submit-btn:active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* ─── Google Button ──────────────────────────────────────────── */
 
 .login-page__google-btn {

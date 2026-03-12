@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { useAuth } from '../../contexts/AuthContext'
@@ -10,12 +10,20 @@ import './LoginPage.css'
 const LoginPage = () => {
   const { user, isLoading, login } = useAuth()
   const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   useEffect(() => {
     if (user) navigate('/home', { replace: true })
   }, [user, navigate])
 
-  const handleSuccess = async (response: CredentialResponse) => {
+  const handleEmailLogin = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    // TODO: implement email/password auth
+    console.log('Email login:', email, password)
+  }
+
+  const handleGoogleSuccess = async (response: CredentialResponse) => {
     if (!response.credential) return
     try {
       await login(response.credential)
@@ -25,7 +33,7 @@ const LoginPage = () => {
     }
   }
 
-  const handleError = () => {
+  const handleGoogleError = () => {
     console.error('Google Sign-In failed')
   }
 
@@ -50,29 +58,53 @@ const LoginPage = () => {
 
         <div className="login-page__body">
           <p className="login-page__welcome">Witaj z powrotem</p>
-          <p className="login-page__description">
-            Zaloguj się, aby zarządzać swoimi finansami
-          </p>
+          <p className="login-page__description">Zaloguj się, aby zarządzać swoimi finansami</p>
 
           {isLoading ? (
             <div className="login-page__spinner" aria-label="Ładowanie..." />
           ) : (
-            <div className="login-page__google-wrap">
-              <GoogleLogin
-                onSuccess={handleSuccess}
-                onError={handleError}
-                theme="filled_black"
-                size="large"
-                shape="rectangular"
-                width={360}
-                text="signin_with"
-              />
-            </div>
-          )}
+            <>
+              <form className="login-page__form" onSubmit={handleEmailLogin} noValidate>
+                <input
+                  className="login-page__input"
+                  type="email"
+                  placeholder="E-mail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  required
+                />
+                <input
+                  className="login-page__input"
+                  type="password"
+                  placeholder="Hasło"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+                <button className="login-page__submit-btn" type="submit">
+                  Zaloguj się
+                </button>
+              </form>
 
-          <div className="login-page__divider">
-            <span>lub</span>
-          </div>
+              <div className="login-page__divider">
+                <span>lub</span>
+              </div>
+
+              <div className="login-page__google-wrap">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  theme="filled_black"
+                  size="large"
+                  shape="rectangular"
+                  width={360}
+                  text="signin_with"
+                />
+              </div>
+            </>
+          )}
 
           <p className="login-page__register-prompt">
             Nie masz jeszcze konta?{' '}
