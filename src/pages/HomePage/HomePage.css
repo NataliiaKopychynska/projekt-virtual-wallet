@@ -281,6 +281,76 @@
   margin-bottom: 1rem;
 }
 
+/* ─── Transaction form ───────────────────────────────────────── */
+
+.home__transaction-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #1c1c1c;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+}
+
+.home__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.home__field span {
+  font-size: 0.75rem;
+  color: rgba(251, 251, 251, 0.6);
+}
+
+.home__field input,
+.home__field select {
+  width: 100%;
+  background: #111111;
+  color: #fbfbfb;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.home__field--full {
+  grid-column: 1 / -1;
+}
+
+.home__form-error {
+  grid-column: 1 / -1;
+  font-size: 0.813rem;
+  color: #ff8080;
+}
+
+.home__form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.home__action-submit,
+.home__action-cancel {
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 0.95rem;
+  font-size: 0.813rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.home__action-submit {
+  background: #4ecdc4;
+  color: #053330;
+}
+
+.home__action-cancel {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fbfbfb;
+}
+
 /* ─── Quick actions ───────────────────────────────────────────── */
 
 .home__actions {
@@ -331,6 +401,12 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.home__transactions-placeholder {
+  font-size: 0.875rem;
+  color: rgba(251, 251, 251, 0.55);
+  margin-bottom: 0.75rem;
 }
 
 .home__tx {
@@ -404,6 +480,26 @@
   color: rgba(251, 251, 251, 0.35);
 }
 
+.home__tx-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.home__tx-action {
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fbfbfb;
+  border-radius: 8px;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.home__tx-action--danger {
+  background: rgba(255, 100, 100, 0.13);
+  color: #ff8b8b;
+}
+
 /* ─── Responsive ──────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
@@ -436,5 +532,18 @@
 
   .home__action-label {
     font-size: 0.688rem;
+  }
+
+  .home__transaction-form {
+    grid-template-columns: 1fr;
+  }
+
+  .home__tx {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .home__tx-right {
+    align-items: flex-start;
   }
 }

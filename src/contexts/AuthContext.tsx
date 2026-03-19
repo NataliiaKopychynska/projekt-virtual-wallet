@@ -17,13 +17,13 @@ import {
   signOut,
   type User as FirebaseUser,
 } from 'firebase/auth'
-import { auth, provider, upsertUserProfile } from '../firebase'
+import { auth, provider } from '../firebase'
 
 export interface AuthUser {
   id: string
-  name: string
+  username: string
   email: string
-  picture: string
+  avatarURL: string
   givenName: string
 }
 
@@ -42,20 +42,20 @@ const API_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:30
 
 const mapUserFromBackend = (user: AuthUser): AuthUser => ({
   id: user.id,
-  name: user.name,
+  username: user.username,
   email: user.email,
-  picture: user.picture,
+  avatarURL: user.avatarURL,
   givenName: user.givenName,
 })
 
 const mapUserFromFirebase = (firebaseUser: FirebaseUser): AuthUser => {
-  const name = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Użytkownik'
+  const username = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Uzytkownik'
   return {
     id: firebaseUser.uid,
-    name,
+    username,
     email: firebaseUser.email || '',
-    picture: firebaseUser.photoURL || '',
-    givenName: name.split(' ')[0] || name,
+    avatarURL: firebaseUser.photoURL || '',
+    givenName: username.split(' ')[0] || username,
   }
 }
 
@@ -87,20 +87,6 @@ const withTimeout = async <T,>(promise: Promise<T>, ms: number): Promise<T> => {
         reject(error)
       })
   })
-}
-
-const safeUpsertUserProfile = async (params: {
-  uid: string
-  email: string
-  name: string
-  picture: string
-  provider: 'google' | 'password'
-}) => {
-  try {
-    await upsertUserProfile(params)
-  } catch (error) {
-    console.error('User profile upsert failed:', error)
-  }
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -164,14 +150,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setUser(appUser)
-
-      await safeUpsertUserProfile({
-        uid: appUser.id,
-        email: appUser.email,
-        name: appUser.name,
-        picture: appUser.picture,
-        provider: 'google',
-      })
     } finally {
       setIsLoading(false)
     }
@@ -193,14 +171,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setUser(appUser)
-
-      await safeUpsertUserProfile({
-        uid: appUser.id,
-        email: appUser.email,
-        name: appUser.name,
-        picture: appUser.picture,
-        provider: 'password',
-      })
     } finally {
       setIsLoading(false)
     }
@@ -222,14 +192,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setUser(appUser)
-
-      await safeUpsertUserProfile({
-        uid: appUser.id,
-        email: appUser.email,
-        name: appUser.name,
-        picture: appUser.picture,
-        provider: 'password',
-      })
     } finally {
       setIsLoading(false)
     }

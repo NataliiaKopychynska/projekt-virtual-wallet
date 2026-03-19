@@ -48,9 +48,9 @@ app.post('/api/auth/firebase', verifyFirebaseToken, async (req, res) => {
   return res.json({
     user: {
       id: firebaseUser.uid,
-      name: firebaseUser.name || '',
+      username: firebaseUser.name || '',
       email: firebaseUser.email,
-      picture: firebaseUser.picture || '',
+      avatarURL: firebaseUser.picture || '',
       givenName: firebaseUser.name ? firebaseUser.name.split(' ')[0] : '',
     },
   })

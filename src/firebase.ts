@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
 
 const firebaseConfig = {
@@ -22,33 +22,3 @@ const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
 export const provider = new GoogleAuthProvider()
-
-export interface UpsertProfilePayload {
-  uid: string
-  email: string
-  name: string
-  picture: string
-  provider: 'google' | 'password'
-}
-
-export const upsertUserProfile = async ({
-  uid,
-  email,
-  name,
-  picture,
-  provider: authProvider,
-}: UpsertProfilePayload) => {
-  await setDoc(
-    doc(db, 'users', uid),
-    {
-      uid,
-      email,
-      name,
-      picture,
-      provider: authProvider,
-      updatedAt: serverTimestamp(),
-      createdAt: serverTimestamp(),
-    },
-    { merge: true },
-  )
-}
