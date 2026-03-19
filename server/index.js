@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors')
-const admin = require('./firebase')
 require('dotenv').config({ path: '../.env' })
+const admin = require('./firebase')
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -27,7 +27,9 @@ async function verifyFirebaseToken(req, res, next) {
     req.firebaseUser = decodedToken
     next()
   } catch (err) {
-    return res.status(401).json({ error: 'Invalid Firebase ID token' })
+    const reason = err && err.message ? err.message : 'Unknown token verification error'
+    console.error('Firebase token verification failed:', reason)
+    return res.status(401).json({ error: `Invalid Firebase ID token: ${reason}` })
   }
 }
 

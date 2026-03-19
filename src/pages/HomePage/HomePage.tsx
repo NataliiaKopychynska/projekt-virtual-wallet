@@ -1,4 +1,5 @@
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import './HomePage.css'
 
@@ -20,9 +21,31 @@ const quickActions = [
 const HomePage = () => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const routeState = location.state as { flashMessage?: string } | null
+  const fallbackFlashMessage = sessionStorage.getItem('vw_toast_message') || ''
+  const [toastMessage, setToastMessage] = useState(routeState?.flashMessage ?? fallbackFlashMessage)
 
-  const handleLogout = () => {
-    logout()
+  useEffect(() => {
+    if (!routeState?.flashMessage) return
+    sessionStorage.removeItem('vw_toast_message')
+    navigate(location.pathname, { replace: true, state: null })
+  }, [location.pathname, navigate, routeState?.flashMessage])
+
+  useEffect(() => {
+    if (!routeState?.flashMessage && fallbackFlashMessage) {
+      sessionStorage.removeItem('vw_toast_message')
+    }
+  }, [fallbackFlashMessage, routeState?.flashMessage])
+
+  useEffect(() => {
+    if (!toastMessage) return
+    const timer = setTimeout(() => setToastMessage(''), 3500)
+    return () => clearTimeout(timer)
+  }, [toastMessage])
+
+  const handleLogout = async () => {
+    await logout()
     navigate('/login', { replace: true })
   }
 
@@ -62,6 +85,20 @@ const HomePage = () => {
 
       {/* ── Main content ── */}
       <main className="home__main">
+        {toastMessage && (
+          <div className="home__flash-message" role="status" aria-live="polite">
+            <span>{toastMessage}</span>
+            <button
+              type="button"
+              className="home__flash-close"
+              onClick={() => setToastMessage('')}
+              aria-label="OK"
+            >
+              OK
+            </button>
+          </div>
+        )}
+
         {/* Top bar */}
         <header className="home__topbar">
           <div>

@@ -3,7 +3,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import type { ReactNode } from 'react'
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
+  if (isLoading) return null
   return user ? <>{children}</> : <Navigate to="/login" replace />
 }
 

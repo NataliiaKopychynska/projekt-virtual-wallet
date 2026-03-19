@@ -101,6 +101,44 @@
   max-width: 860px;
 }
 
+.home__flash-message {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  min-width: 320px;
+  max-width: 460px;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(78, 205, 196, 0.35);
+  background: rgba(78, 205, 196, 0.12);
+  color: #9ff7ef;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.home__flash-close {
+  border: none;
+  background: rgba(159, 247, 239, 0.18);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  color: #9ff7ef;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.home__flash-close:hover {
+  opacity: 1;
+}
+
 /* ─── Top bar ─────────────────────────────────────────────────── */
 
 .home__topbar {
