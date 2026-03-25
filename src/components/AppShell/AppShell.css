@@ -1,0 +1,242 @@
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #101010;
+}
+
+.app-shell__sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #161616;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.25rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.app-shell__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 2.5rem;
+  padding-left: 0.25rem;
+}
+
+.app-shell__brand-icon {
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, #6c63ff, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-shell__brand-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fbfbfb;
+  letter-spacing: -0.01em;
+}
+
+.app-shell__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.app-shell__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(251, 251, 251, 0.5);
+  transition: background 0.2s, color 0.2s;
+}
+
+.app-shell__nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fbfbfb;
+}
+
+.app-shell__nav-item--active {
+  background: rgba(108, 99, 255, 0.15);
+  color: #8b84ff;
+}
+
+.app-shell__nav-item--disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.app-shell__nav-item--disabled:hover {
+  background: transparent;
+  color: rgba(251, 251, 251, 0.5);
+}
+
+.app-shell__logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(251, 251, 251, 0.4);
+  transition: background 0.2s, color 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.app-shell__logout-btn:hover {
+  background: rgba(255, 80, 80, 0.1);
+  color: #ff6b6b;
+}
+
+.app-shell__main {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+}
+
+.app-shell__topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.app-shell__greeting {
+  font-size: 0.875rem;
+  color: rgba(251, 251, 251, 0.45);
+  margin-bottom: 0.125rem;
+}
+
+.app-shell__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fbfbfb;
+  letter-spacing: -0.02em;
+}
+
+.app-shell__subtitle {
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+  color: rgba(251, 251, 251, 0.48);
+}
+
+.app-shell__topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app-shell__context {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.app-shell__context-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(251, 251, 251, 0.4);
+}
+
+.app-shell__context-value {
+  font-size: 0.813rem;
+  color: rgba(251, 251, 251, 0.65);
+}
+
+.app-shell__avatar-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+  border: 2px solid rgba(108, 99, 255, 0.5);
+  transition: border-color 0.2s;
+}
+
+.app-shell__avatar-btn:hover {
+  border-color: #6c63ff;
+}
+
+.app-shell__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.app-shell__avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6c63ff, #4ecdc4);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.app-shell__mobile-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .app-shell__sidebar {
+    display: none;
+  }
+
+  .app-shell__main {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .app-shell__topbar {
+    flex-direction: column;
+  }
+
+  .app-shell__topbar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .app-shell__context {
+    align-items: flex-start;
+  }
+
+  .app-shell__mobile-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .app-shell__mobile-nav-item {
+    display: flex;
+    justify-content: center;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    background: #1c1c1c;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(251, 251, 251, 0.62);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .app-shell__mobile-nav-item--active {
+    background: rgba(108, 99, 255, 0.15);
+    color: #c2beff;
+    border-color: rgba(108, 99, 255, 0.3);
+  }
+}

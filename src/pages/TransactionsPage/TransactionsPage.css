@@ -1,0 +1,233 @@
+.transactions-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.transactions-page__filters,
+.transactions-page__table-card {
+  background: rgba(28, 28, 28, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+.transactions-page__filters {
+  padding: 1.25rem;
+}
+
+.transactions-page__filters-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.transactions-page__eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(78, 205, 196, 0.74);
+  margin-bottom: 0.45rem;
+}
+
+.transactions-page__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fbfbfb;
+}
+
+.transactions-page__reset-btn {
+  background: rgba(108, 99, 255, 0.15);
+  color: #c7c4ff;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.813rem;
+  font-weight: 600;
+}
+
+.transactions-page__filters-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.transactions-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.transactions-page__field span {
+  font-size: 0.75rem;
+  color: rgba(251, 251, 251, 0.62);
+}
+
+.transactions-page__field input,
+.transactions-page__field select {
+  width: 100%;
+  background: #111111;
+  color: #fbfbfb;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 12px;
+  padding: 0.8rem 0.85rem;
+  font-size: 0.875rem;
+}
+
+.transactions-page__field--wide {
+  grid-column: span 2;
+}
+
+.transactions-page__table-card {
+  padding: 1rem;
+}
+
+.transactions-page__table-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.813rem;
+  color: rgba(251, 251, 251, 0.5);
+}
+
+.transactions-page__table-wrap {
+  overflow-x: auto;
+}
+
+.transactions-page__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-page__table th,
+.transactions-page__table td {
+  text-align: left;
+  padding: 0.95rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.transactions-page__table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(251, 251, 251, 0.45);
+}
+
+.transactions-page__table td {
+  font-size: 0.875rem;
+  color: #fbfbfb;
+}
+
+.transactions-page__table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.transactions-page__type-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.transactions-page__type-pill--income {
+  background: rgba(78, 205, 196, 0.12);
+  color: #91ece4;
+}
+
+.transactions-page__type-pill--expense {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(251, 251, 251, 0.78);
+}
+
+.transactions-page__amount {
+  font-weight: 700;
+}
+
+.transactions-page__amount--income {
+  color: #4ecdc4;
+}
+
+.transactions-page__amount--expense {
+  color: #fbfbfb;
+}
+
+.transactions-page__status {
+  padding: 1rem 0.25rem;
+  font-size: 0.875rem;
+  color: rgba(251, 251, 251, 0.58);
+}
+
+.transactions-page__status--error {
+  color: #ff8b8b;
+}
+
+.transactions-page__sentinel {
+  height: 1px;
+}
+
+.transactions-page__cards {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .transactions-page__filters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .transactions-page__field--wide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .transactions-page__filters-head,
+  .transactions-page__table-head {
+    flex-direction: column;
+  }
+
+  .transactions-page__filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .transactions-page__field--wide {
+    grid-column: auto;
+  }
+
+  .transactions-page__table-wrap {
+    display: none;
+  }
+
+  .transactions-page__cards {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .transactions-page__card {
+    background: #161616;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .transactions-page__card-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.813rem;
+    color: rgba(251, 251, 251, 0.6);
+  }
+
+  .transactions-page__card-row strong {
+    color: #fbfbfb;
+    text-align: right;
+  }
+}

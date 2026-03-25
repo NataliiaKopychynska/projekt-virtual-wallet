@@ -1,7 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import LoginPage from './pages/LoginPage/LoginPage'
 import RegisterPage from './pages/RegisterPage/RegisterPage'
-import HomePage from './pages/HomePage/HomePage'
+import DashboardPage from './pages/DashboardPage/DashboardPage'
+import TransactionsPage from './pages/TransactionsPage/TransactionsPage'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 
 const App = () => {
@@ -14,7 +15,23 @@ const App = () => {
         path="/home"
         element={
           <ProtectedRoute>
-            <HomePage />
+            <Navigate to="/home/dashboard" replace />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/home/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/home/transactions"
+        element={
+          <ProtectedRoute>
+            <TransactionsPage />
           </ProtectedRoute>
         }
       />
