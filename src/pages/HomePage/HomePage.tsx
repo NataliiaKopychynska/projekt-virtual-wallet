@@ -14,11 +14,26 @@ import './HomePage.css'
 const quickActions = [
   { icon: '↑', label: 'Wyślij' },
   { icon: '↓', label: 'Odbierz' },
-  { icon: '⊕', label: 'Doładuj' },
-  { icon: '⋯', label: 'Historia' },
 ]
 
-const expenseCategories = ['Zakupy', 'Dom', 'Transport', 'Zdrowie', 'Rozrywka', 'Inne']
+const expenseCategories = [
+  'Zakupy',
+  'Dom',
+  'Transport',
+  'Zdrowie',
+  'Rozrywka',
+  'Jedzenie',
+  'Restauracje',
+  'Edukacja',
+  'Ubrania',
+  'Subskrypcje',
+  'Podróże',
+  'Dzieci',
+  'Zwierzęta',
+  'Prezenty',
+  'Opłaty bankowe',
+  'Inne',
+]
 const incomeCategories = ['Wynagrodzenie', 'Premia', 'Zwrot', 'Sprzedaż', 'Inne']
 
 const toDateInputValue = (date: Date) => {

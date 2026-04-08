@@ -1,8 +1,8 @@
 // Firebase admin initialization for backend
 const fs = require('fs')
 const path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '../.env') })
 const admin = require('firebase-admin')
-const FRONTEND_PROJECT_ID_FALLBACK = 'szwedoproject'
 
 const resolveCredential = () => {
   if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
@@ -12,7 +12,11 @@ const resolveCredential = () => {
 
   const configuredPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH
   const defaultPath = path.join(__dirname, 'firebase-service-account.json')
-  const serviceAccountPath = configuredPath || defaultPath
+  const serviceAccountPath = configuredPath
+    ? path.isAbsolute(configuredPath)
+      ? configuredPath
+      : path.join(__dirname, '..', configuredPath)
+    : defaultPath
 
   if (fs.existsSync(serviceAccountPath)) {
     const fileContent = fs.readFileSync(serviceAccountPath, 'utf8')
@@ -29,7 +33,7 @@ const resolveCredential = () => {
 
 admin.initializeApp({
   credential: resolveCredential(),
-  projectId: process.env.FIREBASE_PROJECT_ID || FRONTEND_PROJECT_ID_FALLBACK,
+  projectId: process.env.FIREBASE_PROJECT_ID,
 })
 
 module.exports = admin

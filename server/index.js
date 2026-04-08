@@ -1,6 +1,5 @@
 const express = require('express')
 const cors = require('cors')
-require('dotenv').config({ path: '../.env' })
 const admin = require('./firebase')
 
 const app = express()
