@@ -7,6 +7,7 @@ import TransactionsPage from './pages/TransactionsPage/TransactionsPage'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage/AnalyticsPage'))
+const SettingsPage = lazy(() => import('./pages/SettingsPage/SettingsPage'))
 
 const App = () => {
   return (
@@ -44,6 +45,16 @@ const App = () => {
           <ProtectedRoute>
             <Suspense fallback={null}>
               <AnalyticsPage />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/home/settings"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <SettingsPage />
             </Suspense>
           </ProtectedRoute>
         }

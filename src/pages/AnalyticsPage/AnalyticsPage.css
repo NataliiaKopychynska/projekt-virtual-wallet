@@ -14,11 +14,9 @@
   background:
     radial-gradient(circle at top right, rgba(78, 205, 196, 0.2), transparent 30%),
     linear-gradient(135deg, rgba(108, 99, 255, 0.18), rgba(13, 116, 108, 0.2)),
-    #161616;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 18px 45px rgba(0, 0, 0, 0.18),
-    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    var(--surface-sidebar);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-lg);
 }
 
 .analytics-page__eyebrow,
@@ -33,13 +31,13 @@
   margin-top: 0.5rem;
   font-size: 1.7rem;
   font-weight: 700;
-  color: #fbfbfb;
+  color: var(--text-primary);
 }
 
 .analytics-page__hero-copy {
   max-width: 640px;
   margin-top: 0.65rem;
-  color: rgba(251, 251, 251, 0.66);
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 
@@ -53,9 +51,9 @@
 .analytics-page__hero-chip {
   padding: 0.7rem 0.95rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(251, 251, 251, 0.8);
+  background: var(--surface-soft);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   font-size: 0.813rem;
   font-weight: 600;
 }
@@ -69,9 +67,9 @@
 .analytics-page__range-btn {
   padding: 0.75rem 1rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  color: rgba(251, 251, 251, 0.65);
+  background: var(--surface-soft);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   font-size: 0.85rem;
   font-weight: 600;
   transition:
@@ -83,22 +81,22 @@
 
 .analytics-page__range-btn:hover {
   transform: translateY(-1px);
-  color: #fbfbfb;
+  color: var(--text-primary);
 }
 
 .analytics-page__range-btn--active {
   background: linear-gradient(135deg, rgba(108, 99, 255, 0.28), rgba(78, 205, 196, 0.22));
   border-color: rgba(78, 205, 196, 0.34);
-  color: #fbfbfb;
+  color: var(--text-primary);
 }
 
 .analytics-page__status,
 .analytics-page__empty {
   padding: 1.25rem;
-  background: rgba(28, 28, 28, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--surface-card-strong);
+  border: 1px solid var(--border-subtle);
   border-radius: 20px;
-  color: rgba(251, 251, 251, 0.65);
+  color: var(--text-secondary);
 }
 
 .analytics-page__status--error {
@@ -113,7 +111,7 @@
 
 .analytics-page__empty h3 {
   font-size: 1.1rem;
-  color: #fbfbfb;
+  color: var(--text-primary);
 }
 
 .analytics-page__empty-actions {
@@ -128,14 +126,15 @@
   justify-content: center;
   padding: 0.8rem 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #fbfbfb;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
   font-size: 0.85rem;
   font-weight: 600;
 }
 
 .analytics-page__empty-link--primary {
   background: linear-gradient(135deg, #4ecdc4, #6c63ff);
+  color: #fff;
 }
 
 .analytics-page__empty--compact {
@@ -150,12 +149,10 @@
 
 .analytics-page__kpi-card,
 .analytics-page__panel {
-  background: rgba(28, 28, 28, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--surface-card-strong);
+  border: 1px solid var(--border-subtle);
   border-radius: 20px;
-  box-shadow:
-    0 18px 45px rgba(0, 0, 0, 0.18),
-    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  box-shadow: var(--shadow-lg);
 }
 
 .analytics-page__kpi-card {
@@ -166,7 +163,7 @@
   font-size: 0.76rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(251, 251, 251, 0.48);
+  color: var(--text-muted);
 }
 
 .analytics-page__kpi-value {
@@ -174,7 +171,7 @@
   margin-top: 0.65rem;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #fbfbfb;
+  color: var(--text-primary);
 }
 
 .analytics-page__kpi-value--positive {
@@ -187,7 +184,7 @@
 
 .analytics-page__kpi-meta {
   margin-top: 0.6rem;
-  color: rgba(251, 251, 251, 0.56);
+  color: var(--text-secondary);
   line-height: 1.5;
   font-size: 0.86rem;
 }
@@ -211,12 +208,12 @@
 .analytics-page__panel-title {
   margin-top: 0.35rem;
   font-size: 1.15rem;
-  color: #fbfbfb;
+  color: var(--text-primary);
 }
 
 .analytics-page__panel-note {
   max-width: 320px;
-  color: rgba(251, 251, 251, 0.54);
+  color: var(--text-secondary);
   text-align: right;
   line-height: 1.5;
   font-size: 0.83rem;
@@ -242,7 +239,7 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: rgba(251, 251, 251, 0.55);
+  color: var(--text-secondary);
   text-align: center;
 }
 
@@ -258,7 +255,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  color: rgba(251, 251, 251, 0.82);
+  color: var(--text-primary);
   font-size: 0.85rem;
 }
 
@@ -275,7 +272,7 @@
 }
 
 .analytics-page__legend-values {
-  color: rgba(251, 251, 251, 0.58);
+  color: var(--text-secondary);
   text-align: right;
 }
 
@@ -289,15 +286,15 @@
   border-radius: 16px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent),
-    rgba(15, 15, 15, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+    var(--surface-muted);
+  border: 1px solid var(--border-subtle);
 }
 
 .analytics-page__insight-label {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(251, 251, 251, 0.48);
+  color: var(--text-muted);
 }
 
 .analytics-page__insight-value {
@@ -305,12 +302,12 @@
   margin-top: 0.55rem;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #fbfbfb;
+  color: var(--text-primary);
 }
 
 .analytics-page__insight-copy {
   margin-top: 0.5rem;
-  color: rgba(251, 251, 251, 0.6);
+  color: var(--text-secondary);
   line-height: 1.55;
   font-size: 0.84rem;
 }

@@ -1,0 +1,317 @@
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-page__toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  min-width: 320px;
+  max-width: 460px;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(78, 205, 196, 0.35);
+  background: rgba(78, 205, 196, 0.12);
+  color: var(--accent-alt-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.settings-page__toast-close {
+  background: rgba(159, 247, 239, 0.18);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  color: var(--accent-alt-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.settings-page__toast-close:hover {
+  opacity: 1;
+}
+
+.settings-page__hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.6rem;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(78, 205, 196, 0.2), transparent 32%),
+    linear-gradient(135deg, rgba(108, 99, 255, 0.16), rgba(78, 205, 196, 0.08)),
+    var(--surface-sidebar);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-lg);
+}
+
+.settings-page__eyebrow,
+.settings-page__section-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(78, 205, 196, 0.78);
+}
+
+.settings-page__hero-title {
+  margin-top: 0.5rem;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.settings-page__hero-copy {
+  max-width: 620px;
+  margin-top: 0.65rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.settings-page__hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.settings-page__hero-chip {
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.813rem;
+  font-weight: 600;
+}
+
+.settings-page__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.settings-page__card {
+  background: var(--surface-card-strong);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  padding: 1.25rem;
+}
+
+.settings-page__card--wide {
+  grid-column: 1 / -1;
+}
+
+.settings-page__card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.settings-page__section-title {
+  margin-top: 0.35rem;
+  font-size: 1.15rem;
+  color: var(--text-primary);
+}
+
+.settings-page__profile-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.95rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  margin-bottom: 1rem;
+}
+
+.settings-page__avatar-shell {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--accent), var(--accent-alt));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.settings-page__avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.settings-page__avatar-fallback {
+  color: #fff;
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.settings-page__profile-name {
+  display: block;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.settings-page__profile-meta {
+  margin-top: 0.3rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.settings-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.settings-page__preferences-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.settings-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.settings-page__field span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.settings-page__field input,
+.settings-page__field select {
+  width: 100%;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 0.85rem 0.9rem;
+  font-size: 0.875rem;
+}
+
+.settings-page__field input:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.settings-page__preview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent),
+    var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.settings-page__preview-card strong {
+  color: var(--text-primary);
+  font-size: 1.15rem;
+}
+
+.settings-page__preview-card span:last-child {
+  color: var(--text-secondary);
+}
+
+.settings-page__preview-label {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.settings-page__feedback {
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.settings-page__feedback--error {
+  color: #ff8b8b;
+}
+
+.settings-page__feedback--success {
+  color: var(--accent-alt-text);
+}
+
+.settings-page__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.settings-page__actions--split {
+  flex-wrap: wrap;
+}
+
+.settings-page__primary-btn,
+.settings-page__secondary-btn {
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.settings-page__primary-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-alt));
+  color: #fff;
+}
+
+.settings-page__secondary-btn {
+  background: var(--surface-soft);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+.settings-page__info-block {
+  padding: 1rem;
+  border-radius: 16px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.settings-page__info-copy {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+@media (max-width: 960px) {
+  .settings-page__grid,
+  .settings-page__preferences-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .settings-page__hero,
+  .settings-page__hero-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .settings-page__actions {
+    flex-direction: column;
+  }
+
+  .settings-page__primary-btn,
+  .settings-page__secondary-btn {
+    width: 100%;
+  }
+}

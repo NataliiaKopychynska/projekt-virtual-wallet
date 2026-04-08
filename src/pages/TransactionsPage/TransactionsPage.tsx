@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import AppShell from '../../components/AppShell/AppShell'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePreferences } from '../../contexts/PreferencesContext'
 import {
   allTransactionCategories,
   transactionTypeOptions,
@@ -29,6 +30,7 @@ const parseAmountInput = (value: string) => {
 
 const TransactionsPage = () => {
   const { user } = useAuth()
+  const { preferences } = usePreferences()
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [type, setType] = useState<'all' | 'income' | 'expense'>('all')
@@ -189,7 +191,7 @@ const TransactionsPage = () => {
               />
             </label>
             <label className="transactions-page__field">
-              <span>Kwota min (PLN)</span>
+              <span>Kwota min ({preferences.currency})</span>
               <input
                 type="text"
                 inputMode="decimal"
@@ -199,7 +201,7 @@ const TransactionsPage = () => {
               />
             </label>
             <label className="transactions-page__field">
-              <span>Kwota max (PLN)</span>
+              <span>Kwota max ({preferences.currency})</span>
               <input
                 type="text"
                 inputMode="decimal"
@@ -250,7 +252,7 @@ const TransactionsPage = () => {
                   <tbody>
                     {transactions.map((transaction) => (
                       <tr key={transaction.tId}>
-                        <td>{formatTransactionDate(transaction.transactionDate)}</td>
+                        <td>{formatTransactionDate(transaction.transactionDate, preferences)}</td>
                         <td>
                           <span
                             className={`transactions-page__type-pill ${
@@ -272,7 +274,7 @@ const TransactionsPage = () => {
                           }`}
                         >
                           {transaction.type === 'income' ? '+' : '-'}
-                          {formatAbsoluteAmount(transaction.amount)}
+                          {formatAbsoluteAmount(transaction.amount, preferences)}
                         </td>
                       </tr>
                     ))}
@@ -285,7 +287,7 @@ const TransactionsPage = () => {
                   <article key={transaction.tId} className="transactions-page__card">
                     <div className="transactions-page__card-row">
                       <span>Data</span>
-                      <strong>{formatTransactionDate(transaction.transactionDate)}</strong>
+                      <strong>{formatTransactionDate(transaction.transactionDate, preferences)}</strong>
                     </div>
                     <div className="transactions-page__card-row">
                       <span>Typ</span>
@@ -309,7 +311,7 @@ const TransactionsPage = () => {
                         }
                       >
                         {transaction.type === 'income' ? '+' : '-'}
-                        {formatAbsoluteAmount(transaction.amount)}
+                        {formatAbsoluteAmount(transaction.amount, preferences)}
                       </strong>
                     </div>
                   </article>

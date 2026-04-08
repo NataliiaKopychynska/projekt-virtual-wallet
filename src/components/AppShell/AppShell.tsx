@@ -13,6 +13,10 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
+  const handleOpenSettings = () => {
+    navigate('/home/settings')
+  }
+
   const handleLogout = async () => {
     await logout()
     navigate('/login', { replace: true })
@@ -51,9 +55,14 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
           >
             <span>◑</span> Analityka
           </NavLink>
-          <span className="app-shell__nav-item app-shell__nav-item--disabled">
+          <NavLink
+            to="/home/settings"
+            className={({ isActive }) =>
+              `app-shell__nav-item${isActive ? ' app-shell__nav-item--active' : ''}`
+            }
+          >
             <span>⚙</span> Ustawienia
-          </span>
+          </NavLink>
         </nav>
 
         <button className="app-shell__logout-btn" onClick={handleLogout}>
@@ -73,7 +82,11 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
               <span className="app-shell__context-label">{title}</span>
               <span className="app-shell__context-value">{user?.email}</span>
             </div>
-            <button className="app-shell__avatar-btn" onClick={handleLogout} title="Wyloguj">
+            <button
+              className="app-shell__avatar-btn"
+              onClick={handleOpenSettings}
+              title="Przejdź do ustawień"
+            >
               {user?.avatarURL ? (
                 <img
                   src={user.avatarURL}
@@ -112,6 +125,14 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
             }
           >
             Analityka
+          </NavLink>
+          <NavLink
+            to="/home/settings"
+            className={({ isActive }) =>
+              `app-shell__mobile-nav-item${isActive ? ' app-shell__mobile-nav-item--active' : ''}`
+            }
+          >
+            Ustawienia
           </NavLink>
         </nav>
 

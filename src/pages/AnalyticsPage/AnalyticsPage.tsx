@@ -17,22 +17,22 @@ import {
 } from 'recharts'
 import AppShell from '../../components/AppShell/AppShell'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePreferences } from '../../contexts/PreferencesContext'
 import {
   analyticsRangeOptions,
   buildAnalyticsDashboardData,
   type AnalyticsRange,
 } from '../../features/analytics/analytics'
+import {
+  formatCurrencyValue,
+  formatDateByPreference,
+  formatPercent,
+} from '../../features/preferences/preferences'
 import { formatAbsoluteAmount, formatTransactionDate } from '../../features/transactions/utils'
 import { subscribeToTransactions, type Transaction } from '../../services/transactionsService'
 import './AnalyticsPage.css'
 
 const CHART_COLORS = ['#4ecdc4', '#6c63ff', '#ffb84d', '#ff7a90', '#78e08f', '#8bd3ff']
-
-const formatCurrency = (value: number) =>
-  value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })
-
-const formatPercent = (value: number) =>
-  `${(value * 100).toLocaleString('pl-PL', { maximumFractionDigits: 1 })}%`
 
 const toTooltipNumber = (value: number | string | ReadonlyArray<string | number> | undefined) => {
   if (Array.isArray(value)) {
@@ -42,26 +42,14 @@ const toTooltipNumber = (value: number | string | ReadonlyArray<string | number>
   return Number(value ?? 0)
 }
 
-const tooltipFormatter = (
-  value: number | string | ReadonlyArray<string | number> | undefined,
-  name: string | number | undefined,
-) => [formatCurrency(toTooltipNumber(value)), String(name ?? '')] as [string, string]
-
-const formatDateRange = (start: Date | null, end: Date) => {
+const formatDateRange = (start: Date | null, end: Date, formatter: (value: Date) => string) => {
   if (!start) return 'Brak danych'
-
-  const format = (value: Date) =>
-    value.toLocaleDateString('pl-PL', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    })
-
-  return `${format(start)} - ${format(end)}`
+  return `${formatter(start)} - ${formatter(end)}`
 }
 
 const AnalyticsPage = () => {
   const { user } = useAuth()
+  const { preferences, resolvedTheme } = usePreferences()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [range, setRange] = useState<AnalyticsRange>('90d')
   const [isLoading, setIsLoading] = useState(true)
@@ -100,18 +88,35 @@ const AnalyticsPage = () => {
     }
 
     const direction = comparison.expensesDiffCents > 0 ? 'wzrosły' : 'spadły'
-    return `Wydatki ${direction} o ${formatAbsoluteAmount(Math.abs(comparison.expensesDiffCents))} (${formatPercent(Math.abs(comparison.expensesDiffPct ?? 0))}) względem poprzedniego okresu.`
-  }, [analytics.summary.comparison])
+    return `Wydatki ${direction} o ${formatAbsoluteAmount(
+      Math.abs(comparison.expensesDiffCents),
+      preferences,
+    )} (${formatPercent(Math.abs(comparison.expensesDiffPct ?? 0), preferences.locale)}) względem poprzedniego okresu.`
+  }, [analytics.summary.comparison, preferences])
 
   const hasAnyTransactions = transactions.length > 0
   const hasRangeData = analytics.filteredTransactions.length > 0
   const summary = analytics.summary
+  const formatCurrency = (value: number) => formatCurrencyValue(value, preferences)
+  const tooltipFormatter = (
+    value: number | string | ReadonlyArray<string | number> | undefined,
+    name: string | number | undefined,
+  ) => [formatCurrencyValue(toTooltipNumber(value), preferences), String(name ?? '')] as [string, string]
+  const tooltipContentStyle = useMemo(
+    () => ({
+      background: resolvedTheme === 'dark' ? '#141414' : '#ffffff',
+      border:
+        resolvedTheme === 'dark'
+          ? '1px solid rgba(255,255,255,0.08)'
+          : '1px solid rgba(23,26,33,0.12)',
+      borderRadius: '14px',
+      color: resolvedTheme === 'dark' ? '#fbfbfb' : '#171a21',
+    }),
+    [resolvedTheme],
+  )
 
   return (
-    <AppShell
-      title="Analityka"
-      subtitle="Wydatki, trendy i kluczowe sygnały z historii konta."
-    >
+    <AppShell title="Analityka" subtitle="Wydatki, trendy i kluczowe sygnały z historii konta.">
       <div className="analytics-page">
         <section className="analytics-page__hero">
           <div>
@@ -124,11 +129,12 @@ const AnalyticsPage = () => {
 
           <div className="analytics-page__hero-meta">
             <span className="analytics-page__hero-chip">
-              Zakres: {formatDateRange(summary.start, summary.end)}
+              Zakres:{' '}
+              {formatDateRange(summary.start, summary.end, (value) =>
+                formatDateByPreference(value, preferences),
+              )}
             </span>
-            <span className="analytics-page__hero-chip">
-              Rekordy: {summary.transactionCount}
-            </span>
+            <span className="analytics-page__hero-chip">Rekordy: {summary.transactionCount}</span>
           </div>
         </section>
 
@@ -182,21 +188,23 @@ const AnalyticsPage = () => {
                   }`}
                 >
                   {summary.netCents >= 0 ? '+' : '-'}
-                  {formatAbsoluteAmount(Math.abs(summary.netCents))}
+                  {formatAbsoluteAmount(Math.abs(summary.netCents), preferences)}
                 </strong>
                 <p className="analytics-page__kpi-meta">Przychody minus wydatki w wybranym okresie.</p>
               </article>
 
               <article className="analytics-page__kpi-card">
                 <span className="analytics-page__kpi-label">Suma wydatków</span>
-                <strong className="analytics-page__kpi-value">{formatAbsoluteAmount(summary.expensesCents)}</strong>
+                <strong className="analytics-page__kpi-value">
+                  {formatAbsoluteAmount(summary.expensesCents, preferences)}
+                </strong>
                 <p className="analytics-page__kpi-meta">Łączny wypływ środków dla aktywnego zakresu czasu.</p>
               </article>
 
               <article className="analytics-page__kpi-card">
                 <span className="analytics-page__kpi-label">Suma przychodów</span>
                 <strong className="analytics-page__kpi-value analytics-page__kpi-value--positive">
-                  {formatAbsoluteAmount(summary.incomeCents)}
+                  {formatAbsoluteAmount(summary.incomeCents, preferences)}
                 </strong>
                 <p className="analytics-page__kpi-meta">Wszystkie zasilenia portfela w badanym okresie.</p>
               </article>
@@ -204,7 +212,7 @@ const AnalyticsPage = () => {
               <article className="analytics-page__kpi-card">
                 <span className="analytics-page__kpi-label">Średni dzienny wydatek</span>
                 <strong className="analytics-page__kpi-value">
-                  {formatAbsoluteAmount(summary.averageDailyExpenseCents)}
+                  {formatAbsoluteAmount(summary.averageDailyExpenseCents, preferences)}
                 </strong>
                 <p className="analytics-page__kpi-meta">Uśrednione tempo wydatków dzień po dniu.</p>
               </article>
@@ -244,15 +252,7 @@ const AnalyticsPage = () => {
                           tickFormatter={formatCurrency}
                           width={92}
                         />
-                        <Tooltip
-                          formatter={tooltipFormatter}
-                          contentStyle={{
-                            background: '#141414',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            borderRadius: '14px',
-                            color: '#fbfbfb',
-                          }}
-                        />
+                        <Tooltip formatter={tooltipFormatter} contentStyle={tooltipContentStyle} />
                         <Legend />
                         <Bar dataKey="income" name="Przychody" fill="#4ecdc4" radius={[10, 10, 0, 0]} />
                         <Bar dataKey="expenses" name="Wydatki" fill="#6c63ff" radius={[10, 10, 0, 0]} />
@@ -295,15 +295,7 @@ const AnalyticsPage = () => {
                                 <Cell key={entry.name} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                               ))}
                             </Pie>
-                            <Tooltip
-                              formatter={tooltipFormatter}
-                              contentStyle={{
-                                background: '#141414',
-                                border: '1px solid rgba(255,255,255,0.08)',
-                                borderRadius: '14px',
-                                color: '#fbfbfb',
-                              }}
-                            />
+                            <Tooltip formatter={tooltipFormatter} contentStyle={tooltipContentStyle} />
                           </PieChart>
                         </ResponsiveContainer>
                       ) : (
@@ -323,7 +315,7 @@ const AnalyticsPage = () => {
                               {item.name}
                             </span>
                             <span className="analytics-page__legend-values">
-                              {formatCurrency(item.value)} • {formatPercent(item.share)}
+                              {formatCurrency(item.value)} • {formatPercent(item.share, preferences.locale)}
                             </span>
                           </li>
                         ))}
@@ -347,7 +339,7 @@ const AnalyticsPage = () => {
                         </strong>
                         <p className="analytics-page__insight-copy">
                           {summary.topExpenseCategory
-                            ? `${formatCurrency(summary.topExpenseCategory.value)} • ${formatPercent(summary.topExpenseCategory.share)} wszystkich wydatków.`
+                            ? `${formatCurrency(summary.topExpenseCategory.value)} • ${formatPercent(summary.topExpenseCategory.share, preferences.locale)} wszystkich wydatków.`
                             : 'Brak wydatków w aktualnym zakresie.'}
                         </p>
                       </div>
@@ -356,12 +348,12 @@ const AnalyticsPage = () => {
                         <span className="analytics-page__insight-label">Największy pojedynczy wydatek</span>
                         <strong className="analytics-page__insight-value">
                           {summary.largestExpense
-                            ? formatAbsoluteAmount(summary.largestExpense.amount)
+                            ? formatAbsoluteAmount(summary.largestExpense.amount, preferences)
                             : 'Brak danych'}
                         </strong>
                         <p className="analytics-page__insight-copy">
                           {summary.largestExpense
-                            ? `${summary.largestExpense.category} • ${summary.largestExpense.comment || 'bez opisu'} • ${formatTransactionDate(summary.largestExpense.transactionDate)}`
+                            ? `${summary.largestExpense.category} • ${summary.largestExpense.comment || 'bez opisu'} • ${formatTransactionDate(summary.largestExpense.transactionDate, preferences)}`
                             : 'Dodaj więcej historii, aby wskazać największy koszt.'}
                         </p>
                       </div>
@@ -370,7 +362,7 @@ const AnalyticsPage = () => {
                         <span className="analytics-page__insight-label">Zmiana okres do okresu</span>
                         <strong className="analytics-page__insight-value">
                           {summary.comparison
-                            ? `${summary.comparison.expensesDiffCents >= 0 ? '+' : '-'}${formatAbsoluteAmount(Math.abs(summary.comparison.expensesDiffCents))}`
+                            ? `${summary.comparison.expensesDiffCents >= 0 ? '+' : '-'}${formatAbsoluteAmount(Math.abs(summary.comparison.expensesDiffCents), preferences)}`
                             : 'Brak porównania'}
                         </strong>
                         <p className="analytics-page__insight-copy">{comparisonMessage}</p>
@@ -410,12 +402,7 @@ const AnalyticsPage = () => {
                         />
                         <Tooltip
                           formatter={(value) => tooltipFormatter(value, 'Wydatki')}
-                          contentStyle={{
-                            background: '#141414',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            borderRadius: '14px',
-                            color: '#fbfbfb',
-                          }}
+                          contentStyle={tooltipContentStyle}
                         />
                         <Line
                           type="monotone"

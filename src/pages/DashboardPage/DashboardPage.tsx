@@ -2,9 +2,12 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AppShell from '../../components/AppShell/AppShell'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePreferences } from '../../contexts/PreferencesContext'
+import { formatCurrencyValue } from '../../features/preferences/preferences'
 import { expenseCategories, incomeCategories, quickActions } from '../../features/transactions/constants'
 import {
   formatAmount,
+  formatTransactionDate,
   sortTransactionsByDateDesc,
   toDateInputValue,
 } from '../../features/transactions/utils'
@@ -36,6 +39,7 @@ const getInitialFormState = (): TransactionFormState => ({
 
 const DashboardPage = () => {
   const { user } = useAuth()
+  const { preferences } = usePreferences()
   const navigate = useNavigate()
   const location = useLocation()
   const routeState = location.state as { flashMessage?: string } | null
@@ -222,9 +226,7 @@ const DashboardPage = () => {
         <section className="dashboard-page__balance-card">
           <div className="dashboard-page__balance-card-inner">
             <p className="dashboard-page__balance-label">Saldo główne</p>
-            <p className="dashboard-page__balance-amount">
-              {balance.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })}
-            </p>
+            <p className="dashboard-page__balance-amount">{formatCurrencyValue(balance, preferences)}</p>
             <p className="dashboard-page__balance-sub">{user?.email}</p>
             <div className="dashboard-page__balance-chip">VISA •••• 4821</div>
           </div>
@@ -250,7 +252,7 @@ const DashboardPage = () => {
             </label>
 
             <label className="dashboard-page__field">
-              <span>Kwota (PLN)</span>
+              <span>Kwota ({preferences.currency})</span>
               <input
                 type="text"
                 inputMode="decimal"
@@ -376,14 +378,9 @@ const DashboardPage = () => {
                         : 'dashboard-page__tx-amount--negative'
                     }`}
                   >
-                    {formatAmount(transaction.amount, transaction.type)}
+                    {formatAmount(transaction.amount, transaction.type, preferences)}
                   </span>
-                  <span className="dashboard-page__tx-date">
-                    {transaction.transactionDate.toLocaleDateString('pl-PL', {
-                      day: '2-digit',
-                      month: 'short',
-                    })}
-                  </span>
+                  <span className="dashboard-page__tx-date">{formatTransactionDate(transaction.transactionDate, preferences)}</span>
                 </div>
                 <div className="dashboard-page__tx-actions">
                   <button

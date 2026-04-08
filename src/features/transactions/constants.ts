@@ -3,8 +3,6 @@ import type { TransactionType } from '../../services/transactionsService'
 export const quickActions = [
   { icon: '↑', label: 'Wyślij' },
   { icon: '↓', label: 'Odbierz' },
-  { icon: '⊕', label: 'Doładuj' },
-  { icon: '⋯', label: 'Historia' },
 ]
 
 export const expenseCategories = [

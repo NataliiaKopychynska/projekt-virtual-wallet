@@ -4,19 +4,26 @@ Frontend aplikacji portfela osobistego zbudowany w `React 19` + `TypeScript` + `
 
 ## Aktualny stan projektu
 
-- Aktywne ścieżki aplikacji: `/login`, `/register`, `/home/dashboard`, `/home/transactions`.
+- Aktywne ścieżki aplikacji: `/login`, `/register`, `/home/dashboard`, `/home/transactions`, `/home/analytics`, `/home/settings`.
 - Po zalogowaniu aplikacja korzysta ze wspólnego `AppShell`.
 - Lewa nawigacja zawiera obecnie: `Pulpit`, `Transakcje`, `Analityka`, `Ustawienia`.
 - Pozycja `Karty` została usunięta z lewego sidebara.
 - `DashboardPage` pokazuje saldo, formularz dodawania/edycji transakcji i ostatnie operacje.
 - `TransactionsPage` pokazuje pełną historię z filtrami oraz doczytywaniem kolejnych rekordów.
+- `AnalyticsPage` pokazuje KPI, trendy wydatków, strukturę kategorii i porównanie do poprzedniego okresu.
+- `SettingsPage` pozwala edytować profil, zmieniać hasło dla kont email/password i ustawiać preferencje aplikacji.
 - W repo nadal istnieje starszy `HomePage`, ale bieżący routing go nie wykorzystuje.
 
 ## Główne moduły
 
 - `src/components/AppShell/AppShell.tsx`: wspólny layout po zalogowaniu, sidebar, topbar i mobilna nawigacja.
+- `src/contexts/PreferencesContext.tsx`: przechowywanie preferencji aplikacji w `localStorage` oraz obsługa motywu.
 - `src/pages/DashboardPage/DashboardPage.tsx`: widok główny z saldem i szybkim zarządzaniem transakcjami.
 - `src/pages/TransactionsPage/TransactionsPage.tsx`: lista transakcji z filtrami, paginacją i infinite scroll.
+- `src/pages/AnalyticsPage/AnalyticsPage.tsx`: dashboard analityczny z wykresami i insightami.
+- `src/pages/SettingsPage/SettingsPage.tsx`: ustawienia profilu, bezpieczeństwa i preferencji interfejsu.
+- `src/features/analytics/analytics.ts`: agregacje KPI, cashflow, breakdown kategorii i porównania okresów.
+- `src/features/preferences/preferences.ts`: definicje preferencji oraz formatowanie walut i dat zgodnie z ustawieniami użytkownika.
 - `src/contexts/AuthContext.tsx`: logowanie email/hasło, Google, reset hasła, utrzymanie sesji.
 - `src/services/transactionsService.ts`: odczyt, zapis, aktualizacja, usuwanie i filtrowanie transakcji w Firestore.
 - `server/index.js`: endpoint `POST /api/auth/firebase` do weryfikacji tokenu Firebase oraz `GET /api/health`.
@@ -24,7 +31,7 @@ Frontend aplikacji portfela osobistego zbudowany w `React 19` + `TypeScript` + `
 
 ## Stack
 
-- Frontend: `React`, `TypeScript`, `react-router-dom`, `Firebase Web SDK`
+- Frontend: `React`, `TypeScript`, `react-router-dom`, `Firebase Web SDK`, `Recharts`
 - Backend pomocniczy: `Express`, `firebase-admin`
 - Narzędzia: `Vite`, `ESLint`, `Prettier`
 
