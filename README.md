@@ -1,73 +1,81 @@
-# React + TypeScript + Vite
+# Virtual Wallet
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend aplikacji portfela osobistego zbudowany w `React 19` + `TypeScript` + `Vite`, z lekkim backendem `Express` do weryfikacji tokenu Firebase. Dane użytkownika i transakcje są oparte o Firebase Auth oraz Firestore.
 
-Currently, two official plugins are available:
+## Aktualny stan projektu
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Aktywne ścieżki aplikacji: `/login`, `/register`, `/home/dashboard`, `/home/transactions`.
+- Po zalogowaniu aplikacja korzysta ze wspólnego `AppShell`.
+- Lewa nawigacja zawiera obecnie: `Pulpit`, `Transakcje`, `Analityka`, `Ustawienia`.
+- Pozycja `Karty` została usunięta z lewego sidebara.
+- `DashboardPage` pokazuje saldo, formularz dodawania/edycji transakcji i ostatnie operacje.
+- `TransactionsPage` pokazuje pełną historię z filtrami oraz doczytywaniem kolejnych rekordów.
+- W repo nadal istnieje starszy `HomePage`, ale bieżący routing go nie wykorzystuje.
 
-## React Compiler
+## Główne moduły
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `src/components/AppShell/AppShell.tsx`: wspólny layout po zalogowaniu, sidebar, topbar i mobilna nawigacja.
+- `src/pages/DashboardPage/DashboardPage.tsx`: widok główny z saldem i szybkim zarządzaniem transakcjami.
+- `src/pages/TransactionsPage/TransactionsPage.tsx`: lista transakcji z filtrami, paginacją i infinite scroll.
+- `src/contexts/AuthContext.tsx`: logowanie email/hasło, Google, reset hasła, utrzymanie sesji.
+- `src/services/transactionsService.ts`: odczyt, zapis, aktualizacja, usuwanie i filtrowanie transakcji w Firestore.
+- `server/index.js`: endpoint `POST /api/auth/firebase` do weryfikacji tokenu Firebase oraz `GET /api/health`.
+- `server/firebase.js`: inicjalizacja Firebase Admin po stronie backendu.
 
-## Expanding the ESLint configuration
+## Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Frontend: `React`, `TypeScript`, `react-router-dom`, `Firebase Web SDK`
+- Backend pomocniczy: `Express`, `firebase-admin`
+- Narzędzia: `Vite`, `ESLint`, `Prettier`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Uruchomienie lokalne
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. Zainstaluj zależności:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Uruchom frontend:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+3. Uruchom backend:
+
+```bash
+npm run dev:server
+```
+
+4. Albo oba procesy naraz:
+
+```bash
+npm run dev:all
+```
+
+Frontend domyślnie działa na `http://localhost:5173`, a backend na `http://localhost:3001`.
+
+## Zmienne środowiskowe
+
+Frontend wymaga konfiguracji Firebase przez:
+
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+- opcjonalnie `VITE_FIREBASE_MEASUREMENT_ID`
+- opcjonalnie `VITE_API_URL` dla adresu backendu
+
+Backend korzysta z:
+
+- `PORT`
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_SERVICE_ACCOUNT_JSON` lub `FIREBASE_SERVICE_ACCOUNT_PATH`
+
+## Uwagi robocze
+
+- Worktree może zawierać równoległe, niezależne zmiany. Przy commitach warto stage'ować tylko pliki związane z aktualnym zakresem pracy.
+- Jeśli pojawi się potrzeba przywrócenia sekcji `Karty`, trzeba dodać zarówno element nawigacji, jak i realną ścieżkę lub widok, bo obecnie taka sekcja nie jest routowana.

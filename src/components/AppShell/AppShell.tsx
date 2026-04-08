@@ -44,9 +44,6 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
             <span>↔</span> Transakcje
           </NavLink>
           <span className="app-shell__nav-item app-shell__nav-item--disabled">
-            <span>◻</span> Karty
-          </span>
-          <span className="app-shell__nav-item app-shell__nav-item--disabled">
             <span>◑</span> Analityka
           </span>
           <span className="app-shell__nav-item app-shell__nav-item--disabled">
