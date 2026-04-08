@@ -43,9 +43,14 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
           >
             <span>↔</span> Transakcje
           </NavLink>
-          <span className="app-shell__nav-item app-shell__nav-item--disabled">
+          <NavLink
+            to="/home/analytics"
+            className={({ isActive }) =>
+              `app-shell__nav-item${isActive ? ' app-shell__nav-item--active' : ''}`
+            }
+          >
             <span>◑</span> Analityka
-          </span>
+          </NavLink>
           <span className="app-shell__nav-item app-shell__nav-item--disabled">
             <span>⚙</span> Ustawienia
           </span>
@@ -99,6 +104,14 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
             }
           >
             Transakcje
+          </NavLink>
+          <NavLink
+            to="/home/analytics"
+            className={({ isActive }) =>
+              `app-shell__mobile-nav-item${isActive ? ' app-shell__mobile-nav-item--active' : ''}`
+            }
+          >
+            Analityka
           </NavLink>
         </nav>
 

@@ -1,9 +1,12 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import LoginPage from './pages/LoginPage/LoginPage'
 import RegisterPage from './pages/RegisterPage/RegisterPage'
 import DashboardPage from './pages/DashboardPage/DashboardPage'
 import TransactionsPage from './pages/TransactionsPage/TransactionsPage'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
+
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage/AnalyticsPage'))
 
 const App = () => {
   return (
@@ -32,6 +35,16 @@ const App = () => {
         element={
           <ProtectedRoute>
             <TransactionsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/home/analytics"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <AnalyticsPage />
+            </Suspense>
           </ProtectedRoute>
         }
       />
