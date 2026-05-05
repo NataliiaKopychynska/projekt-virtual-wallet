@@ -212,7 +212,7 @@ const DashboardPage = () => {
 
   return (
     <AppShell title="Pulpit" subtitle="Saldo, formularz transakcji i ostatnie ruchy na koncie.">
-      <div className="dashboard-page">
+      <div className="dashboard-page" data-testid="dashboard-page">
         {toastMessage && (
           <div className="dashboard-page__flash-message" role="status" aria-live="polite">
             <span>{toastMessage}</span>
@@ -230,7 +230,9 @@ const DashboardPage = () => {
         <section className="dashboard-page__balance-card">
           <div className="dashboard-page__balance-card-inner">
             <p className="dashboard-page__balance-label">Saldo główne</p>
-            <p className="dashboard-page__balance-amount">{formatCurrencyValue(balance, preferences)}</p>
+            <p className="dashboard-page__balance-amount">
+              {formatCurrencyValue(balance, preferences)}
+            </p>
             <p className="dashboard-page__balance-sub">{user?.email}</p>
             <div className="dashboard-page__balance-chip">VISA •••• 4821</div>
           </div>
@@ -241,7 +243,11 @@ const DashboardPage = () => {
           <h2 className="dashboard-page__section-title">
             {editingId ? 'Edytuj transakcję' : 'Dodaj transakcję'}
           </h2>
-          <form className="dashboard-page__transaction-form" onSubmit={handleSubmitTransaction}>
+          <form
+            className="dashboard-page__transaction-form"
+            onSubmit={handleSubmitTransaction}
+            data-testid="transaction-form"
+          >
             <label className="dashboard-page__field">
               <span>Typ</span>
               <select
@@ -249,6 +255,7 @@ const DashboardPage = () => {
                 onChange={(event) =>
                   setFormState((prev) => ({ ...prev, type: event.target.value as TransactionType }))
                 }
+                data-testid="transaction-type-select"
               >
                 <option value="expense">Wydatek</option>
                 <option value="income">Przychód</option>
@@ -261,8 +268,11 @@ const DashboardPage = () => {
                 type="text"
                 inputMode="decimal"
                 value={formState.amount}
-                onChange={(event) => setFormState((prev) => ({ ...prev, amount: event.target.value }))}
+                onChange={(event) =>
+                  setFormState((prev) => ({ ...prev, amount: event.target.value }))
+                }
                 placeholder="np. 54.99"
+                data-testid="transaction-amount-input"
               />
             </label>
 
@@ -273,6 +283,7 @@ const DashboardPage = () => {
                 onChange={(event) =>
                   setFormState((prev) => ({ ...prev, category: event.target.value }))
                 }
+                data-testid="transaction-category-select"
               >
                 {categories.map((category) => (
                   <option key={category} value={category}>
@@ -290,6 +301,7 @@ const DashboardPage = () => {
                 onChange={(event) =>
                   setFormState((prev) => ({ ...prev, transactionDate: event.target.value }))
                 }
+                data-testid="transaction-date-input"
               />
             </label>
 
@@ -303,22 +315,24 @@ const DashboardPage = () => {
                 }
                 placeholder="Opcjonalnie"
                 maxLength={100}
+                data-testid="transaction-comment-input"
               />
             </label>
 
-            {formError && <p className="dashboard-page__form-error">{formError}</p>}
+            {formError && (
+              <p className="dashboard-page__form-error" data-testid="transaction-form-error">
+                {formError}
+              </p>
+            )}
 
             <div className="dashboard-page__form-actions">
               <button
                 type="submit"
                 className="dashboard-page__action-submit"
                 disabled={isSubmitting}
+                data-testid="transaction-submit-button"
               >
-                {isSubmitting
-                  ? 'Zapisywanie...'
-                  : editingId
-                    ? 'Zapisz zmiany'
-                    : 'Dodaj transakcję'}
+                {isSubmitting ? 'Zapisywanie...' : editingId ? 'Zapisz zmiany' : 'Dodaj transakcję'}
               </button>
               {editingId && (
                 <button
@@ -342,15 +356,21 @@ const DashboardPage = () => {
             </Link>
           </div>
 
-          {isTransactionsLoading && <p className="dashboard-page__transactions-placeholder">Ładowanie...</p>}
+          {isTransactionsLoading && (
+            <p className="dashboard-page__transactions-placeholder">Ładowanie...</p>
+          )}
           {!isTransactionsLoading && transactions.length === 0 && (
             <p className="dashboard-page__transactions-placeholder">
               Brak transakcji. Dodaj pierwszą transakcję powyżej.
             </p>
           )}
-          <ul className="dashboard-page__transactions">
+          <ul className="dashboard-page__transactions" data-testid="recent-transactions">
             {recentTransactions.map((transaction) => (
-              <li key={transaction.tId} className="dashboard-page__tx">
+              <li
+                key={transaction.tId}
+                className="dashboard-page__tx"
+                data-testid="recent-transaction"
+              >
                 <div className="dashboard-page__tx-icon-wrap">
                   <span className="dashboard-page__tx-icon">
                     {transaction.type === 'income' ? '↓' : '↑'}
@@ -372,7 +392,9 @@ const DashboardPage = () => {
                   >
                     {formatAmount(transaction.amount, transaction.type, preferences)}
                   </span>
-                  <span className="dashboard-page__tx-date">{formatTransactionDate(transaction.transactionDate, preferences)}</span>
+                  <span className="dashboard-page__tx-date">
+                    {formatTransactionDate(transaction.transactionDate, preferences)}
+                  </span>
                 </div>
                 <div className="dashboard-page__tx-actions">
                   <button

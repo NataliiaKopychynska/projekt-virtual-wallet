@@ -75,10 +75,14 @@ const SettingsPage = () => {
     return (profileState.username.trim() || user?.username || 'U').charAt(0).toUpperCase()
   }, [profileState.username, user?.username])
 
-  const previewDate = useMemo(() => formatDateByPreference(new Date('2026-04-12T12:00:00'), preferencesState), [
-    preferencesState,
-  ])
-  const previewAmount = useMemo(() => formatCurrencyValue(2499.5, preferencesState), [preferencesState])
+  const previewDate = useMemo(
+    () => formatDateByPreference(new Date('2026-04-12T12:00:00'), preferencesState),
+    [preferencesState],
+  )
+  const previewAmount = useMemo(
+    () => formatCurrencyValue(2499.5, preferencesState),
+    [preferencesState],
+  )
   const authProviderLabel = getAuthProviderLabel(user?.authProvider ?? 'unknown')
 
   const handleSaveProfile = async (event: FormEvent<HTMLFormElement>) => {
@@ -186,7 +190,7 @@ const SettingsPage = () => {
       title="Ustawienia"
       subtitle="Zarządzaj profilem, bezpieczeństwem i sposobem prezentacji danych."
     >
-      <div className="settings-page">
+      <div className="settings-page" data-testid="settings-page">
         {profileToast && (
           <div className="settings-page__toast" role="status" aria-live="polite">
             <span>{profileToast}</span>
@@ -220,12 +224,15 @@ const SettingsPage = () => {
             <p className="settings-page__eyebrow">Account Center</p>
             <h2 className="settings-page__hero-title">Ustawienia konta i aplikacji</h2>
             <p className="settings-page__hero-copy">
-              Tu zmienisz dane profilu, sposób logowania oraz format prezentacji kwot i dat w aplikacji.
+              Tu zmienisz dane profilu, sposób logowania oraz format prezentacji kwot i dat w
+              aplikacji.
             </p>
           </div>
 
           <div className="settings-page__hero-meta">
-            <span className="settings-page__hero-chip">Motyw: {resolvedTheme === 'dark' ? 'ciemny' : 'jasny'}</span>
+            <span className="settings-page__hero-chip">
+              Motyw: {resolvedTheme === 'dark' ? 'ciemny' : 'jasny'}
+            </span>
           </div>
         </section>
 
@@ -295,10 +302,18 @@ const SettingsPage = () => {
                 <input type="text" value={authProviderLabel} disabled />
               </label>
 
-              {profileError && <p className="settings-page__feedback settings-page__feedback--error">{profileError}</p>}
+              {profileError && (
+                <p className="settings-page__feedback settings-page__feedback--error">
+                  {profileError}
+                </p>
+              )}
 
               <div className="settings-page__actions">
-                <button type="submit" className="settings-page__primary-btn" disabled={isSavingProfile}>
+                <button
+                  type="submit"
+                  className="settings-page__primary-btn"
+                  disabled={isSavingProfile}
+                >
                   {isSavingProfile ? 'Zapisywanie...' : 'Zapisz profil'}
                 </button>
               </div>
@@ -321,7 +336,10 @@ const SettingsPage = () => {
                     type="password"
                     value={passwordState.nextPassword}
                     onChange={(event) =>
-                      setPasswordState((current) => ({ ...current, nextPassword: event.target.value }))
+                      setPasswordState((current) => ({
+                        ...current,
+                        nextPassword: event.target.value,
+                      }))
                     }
                     placeholder="Minimum 6 znaków"
                     autoComplete="new-password"
@@ -334,18 +352,33 @@ const SettingsPage = () => {
                     type="password"
                     value={passwordState.repeatPassword}
                     onChange={(event) =>
-                      setPasswordState((current) => ({ ...current, repeatPassword: event.target.value }))
+                      setPasswordState((current) => ({
+                        ...current,
+                        repeatPassword: event.target.value,
+                      }))
                     }
                     placeholder="Powtórz hasło"
                     autoComplete="new-password"
                   />
                 </label>
 
-                {securityError && <p className="settings-page__feedback settings-page__feedback--error">{securityError}</p>}
-                {securityMessage && <p className="settings-page__feedback settings-page__feedback--success">{securityMessage}</p>}
+                {securityError && (
+                  <p className="settings-page__feedback settings-page__feedback--error">
+                    {securityError}
+                  </p>
+                )}
+                {securityMessage && (
+                  <p className="settings-page__feedback settings-page__feedback--success">
+                    {securityMessage}
+                  </p>
+                )}
 
                 <div className="settings-page__actions">
-                  <button type="submit" className="settings-page__primary-btn" disabled={isSavingPassword}>
+                  <button
+                    type="submit"
+                    className="settings-page__primary-btn"
+                    disabled={isSavingPassword}
+                  >
                     {isSavingPassword ? 'Zapisywanie...' : 'Zmień hasło'}
                   </button>
                 </div>
@@ -353,10 +386,19 @@ const SettingsPage = () => {
             ) : (
               <div className="settings-page__info-block">
                 <p className="settings-page__info-copy">
-                  To konto nie korzysta z lokalnego hasła, więc zmiana hasła nie jest dostępna z poziomu aplikacji.
+                  To konto nie korzysta z lokalnego hasła, więc zmiana hasła nie jest dostępna z
+                  poziomu aplikacji.
                 </p>
-                {securityError && <p className="settings-page__feedback settings-page__feedback--error">{securityError}</p>}
-                {securityMessage && <p className="settings-page__feedback settings-page__feedback--success">{securityMessage}</p>}
+                {securityError && (
+                  <p className="settings-page__feedback settings-page__feedback--error">
+                    {securityError}
+                  </p>
+                )}
+                {securityMessage && (
+                  <p className="settings-page__feedback settings-page__feedback--success">
+                    {securityMessage}
+                  </p>
+                )}
               </div>
             )}
           </section>
@@ -369,7 +411,11 @@ const SettingsPage = () => {
               </div>
             </div>
 
-            <form className="settings-page__form" onSubmit={handleSavePreferences}>
+            <form
+              className="settings-page__form"
+              onSubmit={handleSavePreferences}
+              data-testid="preferences-form"
+            >
               <div className="settings-page__preferences-grid">
                 <label className="settings-page__field">
                   <span>Waluta</span>
@@ -381,6 +427,7 @@ const SettingsPage = () => {
                         currency: event.target.value as typeof current.currency,
                       }))
                     }
+                    data-testid="preferences-currency-select"
                   >
                     {currencyOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -438,6 +485,7 @@ const SettingsPage = () => {
                         theme: event.target.value as typeof current.theme,
                       }))
                     }
+                    data-testid="preferences-theme-select"
                   >
                     {themeOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -455,11 +503,18 @@ const SettingsPage = () => {
               </div>
 
               {preferencesError && (
-                <p className="settings-page__feedback settings-page__feedback--error">{preferencesError}</p>
+                <p className="settings-page__feedback settings-page__feedback--error">
+                  {preferencesError}
+                </p>
               )}
 
               <div className="settings-page__actions settings-page__actions--split">
-                <button type="submit" className="settings-page__primary-btn" disabled={isSavingPreferences}>
+                <button
+                  type="submit"
+                  className="settings-page__primary-btn"
+                  disabled={isSavingPreferences}
+                  data-testid="preferences-submit-button"
+                >
                   {isSavingPreferences ? 'Zapisywanie...' : 'Zapisz preferencje'}
                 </button>
                 <button

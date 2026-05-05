@@ -39,8 +39,7 @@ const LoginPage = () => {
       await loginWithGoogle()
       navigate('/home', { replace: true })
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Nie udało się zalogować przez Google.'
+      const message = err instanceof Error ? err.message : 'Nie udało się zalogować przez Google.'
       setError(message)
     }
   }
@@ -57,14 +56,13 @@ const LoginPage = () => {
       await resetPassword(email)
       setInfo('Wysłaliśmy email z linkiem do resetu hasła.')
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Nie udało się wysłać resetu hasła.'
+      const message = err instanceof Error ? err.message : 'Nie udało się wysłać resetu hasła.'
       setError(message)
     }
   }
 
   return (
-    <div className="login-page">
+    <div className="login-page" data-testid="login-page">
       <picture className="login-page__bg" aria-hidden="true">
         <source media="(min-width: 1024px)" srcSet={loginBgDesktop} />
         <source media="(min-width: 768px)" srcSet={loginBgTablet} />
@@ -84,9 +82,7 @@ const LoginPage = () => {
 
         <div className="login-page__body">
           <p className="login-page__welcome">Witaj z powrotem</p>
-          <p className="login-page__description">
-            Zaloguj się, aby zarządzać swoimi finansami
-          </p>
+          <p className="login-page__description">Zaloguj się, aby zarządzać swoimi finansami</p>
 
           <form className="login-page__form" onSubmit={handleEmailLogin}>
             <label className="login-page__field-label" htmlFor="email">
@@ -121,11 +117,17 @@ const LoginPage = () => {
               type="button"
               className="login-page__forgot-link"
               onClick={handleForgotPassword}
+              data-testid="forgot-password-button"
             >
               Zapomniałem hasła
             </button>
 
-            <button className="login-page__submit-btn" type="submit" disabled={isLoading}>
+            <button
+              className="login-page__submit-btn"
+              type="submit"
+              disabled={isLoading}
+              data-testid="login-submit-button"
+            >
               Zaloguj
             </button>
           </form>
@@ -141,6 +143,7 @@ const LoginPage = () => {
             className="login-page__google-btn"
             onClick={handleGoogleLogin}
             disabled={isLoading}
+            data-testid="login-google-button"
           >
             <span className="login-page__google-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="18" height="18">
@@ -165,8 +168,16 @@ const LoginPage = () => {
             Zaloguj przez Google
           </button>
 
-          {error && <p className="login-page__message login-page__message--error">{error}</p>}
-          {info && <p className="login-page__message login-page__message--info">{info}</p>}
+          {error && (
+            <p className="login-page__message login-page__message--error" data-testid="login-error">
+              {error}
+            </p>
+          )}
+          {info && (
+            <p className="login-page__message login-page__message--info" data-testid="login-info">
+              {info}
+            </p>
+          )}
 
           <p className="login-page__register-prompt">
             Nie masz jeszcze konta?{' '}

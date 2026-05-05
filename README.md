@@ -7,16 +7,18 @@ Frontend aplikacji portfela osobistego zbudowany w `React 19` + `TypeScript` + `
 - Aktywne ścieżki aplikacji: `/login`, `/register`, `/home/dashboard`, `/home/transactions`, `/home/analytics`, `/home/settings`.
 - Po zalogowaniu aplikacja korzysta ze wspólnego `AppShell`.
 - Lewa nawigacja zawiera obecnie: `Pulpit`, `Transakcje`, `Analityka`, `Ustawienia`.
+- Desktopowy sidebar w `AppShell` można zwinąć do paska ikon; stan zwinięcia jest zapisywany w `localStorage`.
 - Pozycja `Karty` została usunięta z lewego sidebara.
 - `DashboardPage` pokazuje saldo, formularz dodawania/edycji transakcji i ostatnie operacje.
 - `TransactionsPage` pokazuje pełną historię z filtrami oraz doczytywaniem kolejnych rekordów.
 - `AnalyticsPage` pokazuje KPI, trendy wydatków, strukturę kategorii i porównanie do poprzedniego okresu.
 - `SettingsPage` pozwala edytować profil, zmieniać hasło dla kont email/password i ustawiać preferencje aplikacji.
+- Testy E2E Selenium obejmują publiczne ekrany logowania/rejestracji oraz wybrane przepływy po zalogowaniu na koncie testowym.
 - W repo nadal istnieje starszy `HomePage`, ale bieżący routing go nie wykorzystuje.
 
 ## Główne moduły
 
-- `src/components/AppShell/AppShell.tsx`: wspólny layout po zalogowaniu, sidebar, topbar i mobilna nawigacja.
+- `src/components/AppShell/AppShell.tsx`: wspólny layout po zalogowaniu, zwijany sidebar, topbar i mobilna nawigacja.
 - `src/contexts/PreferencesContext.tsx`: przechowywanie preferencji aplikacji w `localStorage` oraz obsługa motywu.
 - `src/pages/DashboardPage/DashboardPage.tsx`: widok główny z saldem i szybkim zarządzaniem transakcjami.
 - `src/pages/TransactionsPage/TransactionsPage.tsx`: lista transakcji z filtrami, paginacją i infinite scroll.
@@ -28,6 +30,7 @@ Frontend aplikacji portfela osobistego zbudowany w `React 19` + `TypeScript` + `
 - `src/services/transactionsService.ts`: odczyt, zapis, aktualizacja, usuwanie i filtrowanie transakcji w Firestore.
 - `server/index.js`: endpoint `POST /api/auth/firebase` do weryfikacji tokenu Firebase oraz `GET /api/health`.
 - `server/firebase.js`: inicjalizacja Firebase Admin po stronie backendu.
+- `server/seedMockTransactions.js`: skrypt seedujący realistyczne transakcje testowe do Firestore dla wskazanego użytkownika.
 
 ## Stack
 
@@ -63,6 +66,8 @@ npm run dev:all
 
 Frontend domyślnie działa na `http://localhost:5173`, a backend na `http://localhost:3001`.
 
+Przed uruchomieniem warto skopiować `.env.example` do `.env` i uzupełnić wszystkie wymagane wartości Firebase.
+
 ## Zmienne środowiskowe
 
 Frontend wymaga konfiguracji Firebase przez:
@@ -76,11 +81,50 @@ Frontend wymaga konfiguracji Firebase przez:
 - opcjonalnie `VITE_FIREBASE_MEASUREMENT_ID`
 - opcjonalnie `VITE_API_URL` dla adresu backendu
 
+Frontend nie ma już fallbacków dla konfiguracji Firebase. Brak wymaganej zmiennej zatrzyma start aplikacji komunikatem błędu.
+
 Backend korzysta z:
 
 - `PORT`
 - `FIREBASE_PROJECT_ID`
 - `FIREBASE_SERVICE_ACCOUNT_JSON` lub `FIREBASE_SERVICE_ACCOUNT_PATH`
+
+`FIREBASE_SERVICE_ACCOUNT_PATH` może być ścieżką względną względem katalogu repo albo ścieżką absolutną.
+
+## Seed danych
+
+Do lokalnego zasilenia Firestore przykładową historią transakcji można użyć:
+
+```bash
+node server/seedMockTransactions.js user@example.com
+```
+
+Jeśli nie podasz adresu email, skrypt użyje domyślnego użytkownika zdefiniowanego w pliku.
+
+## Testy E2E Selenium
+
+Testy Selenium działają przez `node --test` i uruchamiają lokalny frontend Vite, jeśli nie jest już dostępny pod `http://localhost:5173`.
+
+```bash
+npm run test:e2e
+```
+
+Tryb z widoczną przeglądarką:
+
+```bash
+npm run test:e2e:headed
+```
+
+Testy publicznych ekranów nie wymagają konta. Scenariusze po zalogowaniu uruchomią się tylko po ustawieniu:
+
+```bash
+E2E_TEST_EMAIL=test@example.com
+E2E_TEST_PASSWORD=haslo-testowe
+```
+
+Opcjonalnie można nadpisać adres aplikacji przez `E2E_BASE_URL`.
+
+Testy czytają zmienne z `.env`, więc konto testowe można dopisać bez eksportowania zmiennych w terminalu. Instrukcja demonstracji na zajęciach znajduje się w `docs/selenium-presentation.md`.
 
 ## Uwagi robocze
 

@@ -52,6 +52,7 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
     <div className="app-shell">
       <aside
         className={`app-shell__sidebar${isSidebarCollapsed ? ' app-shell__sidebar--collapsed' : ''}`}
+        data-testid="app-shell-sidebar"
       >
         <div className="app-shell__brand">
           <div className="app-shell__brand-lockup">
@@ -65,6 +66,7 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
           onClick={handleToggleSidebar}
           aria-label={isSidebarCollapsed ? 'Rozwiń panel boczny' : 'Zwiń panel boczny'}
           title={isSidebarCollapsed ? 'Rozwiń panel boczny' : 'Zwiń panel boczny'}
+          data-testid="app-shell-sidebar-toggle"
         >
           <span aria-hidden="true">{isSidebarCollapsed ? '›' : '‹'}</span>
         </button>
@@ -87,7 +89,12 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
           ))}
         </nav>
 
-        <button className="app-shell__logout-btn" onClick={handleLogout} title="Wyloguj">
+        <button
+          className="app-shell__logout-btn"
+          onClick={handleLogout}
+          title="Wyloguj"
+          data-testid="app-shell-logout-button"
+        >
           <span className="app-shell__nav-icon" aria-hidden="true">
             ⏻
           </span>

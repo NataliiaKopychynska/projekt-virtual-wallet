@@ -13,6 +13,7 @@ import {
   toDateInputValue,
 } from '../../features/transactions/utils'
 import {
+  deleteTransaction,
   fetchTransactionsPage,
   type Transaction,
   type TransactionCursor,
@@ -42,6 +43,7 @@ const TransactionsPage = () => {
   const [hasMore, setHasMore] = useState(true)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const sentinelRef = useRef<HTMLDivElement | null>(null)
 
@@ -129,13 +131,33 @@ const TransactionsPage = () => {
     setAmountMax('')
   }
 
+  const handleDeleteTransaction = async (transaction: Transaction) => {
+    if (!user?.id || deletingId) return
+
+    const isConfirmed = window.confirm('Czy na pewno chcesz usunąć tę transakcję?')
+    if (!isConfirmed) return
+
+    setDeletingId(transaction.tId)
+    setErrorMessage('')
+
+    try {
+      await deleteTransaction(user.id, transaction.tId)
+      setTransactions((current) => current.filter((item) => item.tId !== transaction.tId))
+    } catch (error) {
+      console.error('Deleting transaction from history failed:', error)
+      setErrorMessage('Nie udało się usunąć transakcji. Spróbuj ponownie.')
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   return (
     <AppShell
       title="Transakcje"
       subtitle="Pełna historia operacji z filtrowaniem i doczytywaniem kolejnych rekordów."
     >
-      <div className="transactions-page">
-        <section className="transactions-page__filters">
+      <div className="transactions-page" data-testid="transactions-page">
+        <section className="transactions-page__filters" data-testid="transactions-filters">
           <div className="transactions-page__filters-head">
             <div>
               <p className="transactions-page__eyebrow">Historia konta</p>
@@ -145,6 +167,7 @@ const TransactionsPage = () => {
               type="button"
               className="transactions-page__reset-btn"
               onClick={handleResetFilters}
+              data-testid="transactions-reset-filters"
             >
               Resetuj filtry
             </button>
@@ -153,11 +176,19 @@ const TransactionsPage = () => {
           <div className="transactions-page__filters-grid">
             <label className="transactions-page__field">
               <span>Data od</span>
-              <input type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} />
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(event) => setDateFrom(event.target.value)}
+              />
             </label>
             <label className="transactions-page__field">
               <span>Data do</span>
-              <input type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(event) => setDateTo(event.target.value)}
+              />
             </label>
             <label className="transactions-page__field">
               <span>Typ</span>
@@ -187,6 +218,7 @@ const TransactionsPage = () => {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="np. Lidl, pensja, Netflix"
+                data-testid="transactions-search-input"
               />
             </label>
             <label className="transactions-page__field">
@@ -212,7 +244,7 @@ const TransactionsPage = () => {
           </div>
         </section>
 
-        <section className="transactions-page__table-card">
+        <section className="transactions-page__table-card" data-testid="transactions-results">
           <div className="transactions-page__table-head">
             <span>{transactions.length} rekordów w aktualnym widoku</span>
             {(dateFrom || dateTo) && (
@@ -230,9 +262,7 @@ const TransactionsPage = () => {
             </p>
           )}
           {!isInitialLoading && !errorMessage && transactions.length === 0 && (
-            <p className="transactions-page__status">
-              Brak wyników dla wybranych filtrów.
-            </p>
+            <p className="transactions-page__status">Brak wyników dla wybranych filtrów.</p>
           )}
 
           {transactions.length > 0 && (
@@ -246,11 +276,16 @@ const TransactionsPage = () => {
                       <th>Kategoria</th>
                       <th>Opis</th>
                       <th>Kwota</th>
+                      <th>Akcje</th>
                     </tr>
                   </thead>
                   <tbody>
                     {transactions.map((transaction) => (
-                      <tr key={transaction.tId}>
+                      <tr
+                        key={transaction.tId}
+                        data-testid="transactions-table-row"
+                        data-transaction-id={transaction.tId}
+                      >
                         <td>{formatTransactionDate(transaction.transactionDate, preferences)}</td>
                         <td>
                           <span
@@ -275,6 +310,17 @@ const TransactionsPage = () => {
                           {transaction.type === 'income' ? '+' : '-'}
                           {formatAbsoluteAmount(transaction.amount, preferences)}
                         </td>
+                        <td>
+                          <button
+                            type="button"
+                            className="transactions-page__delete-btn"
+                            onClick={() => void handleDeleteTransaction(transaction)}
+                            disabled={deletingId === transaction.tId}
+                            data-testid="transactions-delete-button"
+                          >
+                            {deletingId === transaction.tId ? 'Usuwanie...' : 'Usuń'}
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -286,7 +332,9 @@ const TransactionsPage = () => {
                   <article key={transaction.tId} className="transactions-page__card">
                     <div className="transactions-page__card-row">
                       <span>Data</span>
-                      <strong>{formatTransactionDate(transaction.transactionDate, preferences)}</strong>
+                      <strong>
+                        {formatTransactionDate(transaction.transactionDate, preferences)}
+                      </strong>
                     </div>
                     <div className="transactions-page__card-row">
                       <span>Typ</span>
@@ -313,6 +361,15 @@ const TransactionsPage = () => {
                         {formatAbsoluteAmount(transaction.amount, preferences)}
                       </strong>
                     </div>
+                    <button
+                      type="button"
+                      className="transactions-page__delete-btn"
+                      onClick={() => void handleDeleteTransaction(transaction)}
+                      disabled={deletingId === transaction.tId}
+                      data-testid="transactions-delete-button"
+                    >
+                      {deletingId === transaction.tId ? 'Usuwanie...' : 'Usuń'}
+                    </button>
                   </article>
                 ))}
               </div>

@@ -79,7 +79,7 @@ const RegisterPage = () => {
   }
 
   return (
-    <div className="login-page">
+    <div className="login-page" data-testid="register-page">
       <picture className="login-page__bg" aria-hidden="true">
         <source media="(min-width: 1024px)" srcSet={loginBgDesktop} />
         <source media="(min-width: 768px)" srcSet={loginBgTablet} />
@@ -99,11 +99,9 @@ const RegisterPage = () => {
 
         <div className="login-page__body">
           <p className="login-page__welcome">Utwórz konto</p>
-          <p className="login-page__description">
-            Zarejestruj się, aby zarządzać swoimi finansami
-          </p>
+          <p className="login-page__description">Zarejestruj się, aby zarządzać swoimi finansami</p>
 
-          <form className="login-page__form" onSubmit={handleRegister}>
+          <form className="login-page__form" onSubmit={handleRegister} noValidate>
             <label className="login-page__field-label" htmlFor="email">
               Email
             </label>
@@ -146,7 +144,12 @@ const RegisterPage = () => {
               required
             />
 
-            <button className="login-page__submit-btn" type="submit" disabled={isLoading}>
+            <button
+              className="login-page__submit-btn"
+              type="submit"
+              disabled={isLoading}
+              data-testid="register-submit-button"
+            >
               {isLoading ? 'Rejestruję...' : 'Zarejestruj się'}
             </button>
           </form>
@@ -186,8 +189,22 @@ const RegisterPage = () => {
             Zarejestruj przez Google
           </button>
 
-          {error && <p className="login-page__message login-page__message--error">{error}</p>}
-          {info && <p className="login-page__message login-page__message--info">{info}</p>}
+          {error && (
+            <p
+              className="login-page__message login-page__message--error"
+              data-testid="register-error"
+            >
+              {error}
+            </p>
+          )}
+          {info && (
+            <p
+              className="login-page__message login-page__message--info"
+              data-testid="register-info"
+            >
+              {info}
+            </p>
+          )}
 
           <p className="login-page__register-prompt">
             Masz już konto?{' '}
