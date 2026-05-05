@@ -7,6 +7,32 @@ import {
   type AppPreferences,
 } from '../preferences/preferences'
 
+interface ParseCurrencyAmountOptions {
+  allowZero?: boolean
+}
+
+const currencyAmountPattern = /^\d+(?:[,.]\d{1,2})?$/
+
+export const parseCurrencyAmountToCents = (
+  value: string,
+  options: ParseCurrencyAmountOptions = {},
+) => {
+  const amount = value.trim()
+  if (!amount || !currencyAmountPattern.test(amount)) return null
+
+  const [wholePart, fractionalPart = ''] = amount.replace(',', '.').split('.')
+  const cents = Number(wholePart) * 100 + Number(fractionalPart.padEnd(2, '0'))
+  const minimumAmount = options.allowZero ? 0 : 1
+
+  if (!Number.isSafeInteger(cents) || cents < minimumAmount) return null
+
+  return cents
+}
+
+export const parseTransactionAmountToCents = (value: string) => {
+  return parseCurrencyAmountToCents(value)
+}
+
 export const toDateInputValue = (date: Date) => {
   const year = date.getFullYear()
   const month = `${date.getMonth() + 1}`.padStart(2, '0')

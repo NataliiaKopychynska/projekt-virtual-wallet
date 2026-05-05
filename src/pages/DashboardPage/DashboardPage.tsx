@@ -8,6 +8,7 @@ import { expenseCategories, incomeCategories, quickActions } from '../../feature
 import {
   formatAmount,
   formatTransactionDate,
+  parseTransactionAmountToCents,
   sortTransactionsByDateDesc,
   toDateInputValue,
 } from '../../features/transactions/utils'
@@ -116,9 +117,8 @@ const DashboardPage = () => {
   }
 
   const validateForm = () => {
-    const parsedAmount = Number(formState.amount.replace(',', '.'))
-    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-      return 'Podaj poprawną kwotę większą od zera.'
+    if (parseTransactionAmountToCents(formState.amount) === null) {
+      return 'Podaj poprawną kwotę większą od zera, maksymalnie z dwoma miejscami po przecinku.'
     }
 
     if (!formState.transactionDate) {
@@ -137,10 +137,14 @@ const DashboardPage = () => {
   }
 
   const buildPayload = () => {
-    const parsedAmount = Number(formState.amount.replace(',', '.'))
+    const amountCents = parseTransactionAmountToCents(formState.amount)
+    if (amountCents === null) {
+      throw new Error('Invalid transaction amount')
+    }
+
     return {
       type: formState.type,
-      amount: Math.round(parsedAmount * 100),
+      amount: amountCents,
       category: formState.category.trim(),
       comment: formState.comment.trim(),
       transactionDate: new Date(`${formState.transactionDate}T12:00:00`),

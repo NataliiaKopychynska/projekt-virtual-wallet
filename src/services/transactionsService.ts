@@ -60,6 +60,12 @@ export interface TransactionPageResult {
 
 const transactionsCollection = (uid: string) => collection(db, 'users', uid, 'transactions')
 
+const validateTransactionInput = (payload: TransactionInput) => {
+  if (!Number.isSafeInteger(payload.amount) || payload.amount <= 0) {
+    throw new Error('Invalid transaction amount')
+  }
+}
+
 const toDateOrNull = (value: unknown) => {
   if (value instanceof Timestamp) return value.toDate()
   return null
@@ -229,6 +235,8 @@ export const fetchTransactionsPage = async (
 }
 
 export const createTransaction = async (uid: string, payload: TransactionInput) => {
+  validateTransactionInput(payload)
+
   await addDoc(transactionsCollection(uid), {
     ...payload,
     createdAt: serverTimestamp(),
@@ -236,6 +244,8 @@ export const createTransaction = async (uid: string, payload: TransactionInput) 
 }
 
 export const updateTransaction = async (uid: string, txId: string, payload: TransactionInput) => {
+  validateTransactionInput(payload)
+
   await updateDoc(doc(db, 'users', uid, 'transactions', txId), { ...payload })
 }
 

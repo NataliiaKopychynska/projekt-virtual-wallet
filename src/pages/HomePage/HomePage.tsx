@@ -2,6 +2,10 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import {
+  parseTransactionAmountToCents,
+  toDateInputValue,
+} from '../../features/transactions/utils'
+import {
   createTransaction,
   deleteTransaction,
   subscribeToTransactions,
@@ -35,13 +39,6 @@ const expenseCategories = [
   'Inne',
 ]
 const incomeCategories = ['Wynagrodzenie', 'Premia', 'Zwrot', 'Sprzedaż', 'Inne']
-
-const toDateInputValue = (date: Date) => {
-  const year = date.getFullYear()
-  const month = `${date.getMonth() + 1}`.padStart(2, '0')
-  const day = `${date.getDate()}`.padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
 
 const formatAmount = (amount: number, type: TransactionType) => {
   const value = amount / 100
@@ -144,9 +141,8 @@ const HomePage = () => {
   }
 
   const validateForm = () => {
-    const parsedAmount = Number(formState.amount.replace(',', '.'))
-    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-      return 'Podaj poprawną kwotę większą od zera.'
+    if (parseTransactionAmountToCents(formState.amount) === null) {
+      return 'Podaj poprawną kwotę większą od zera, maksymalnie z dwoma miejscami po przecinku.'
     }
 
     if (!formState.transactionDate) {
@@ -165,10 +161,14 @@ const HomePage = () => {
   }
 
   const buildPayload = () => {
-    const parsedAmount = Number(formState.amount.replace(',', '.'))
+    const amountCents = parseTransactionAmountToCents(formState.amount)
+    if (amountCents === null) {
+      throw new Error('Invalid transaction amount')
+    }
+
     return {
       type: formState.type,
-      amount: Math.round(parsedAmount * 100),
+      amount: amountCents,
       category: formState.category.trim(),
       comment: formState.comment.trim(),
       transactionDate: new Date(`${formState.transactionDate}T12:00:00`),

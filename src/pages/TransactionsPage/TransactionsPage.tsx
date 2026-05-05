@@ -9,6 +9,7 @@ import {
 import {
   formatAbsoluteAmount,
   formatTransactionDate,
+  parseCurrencyAmountToCents,
   toDateInputValue,
 } from '../../features/transactions/utils'
 import {
@@ -23,9 +24,7 @@ const PAGE_SIZE = 25
 
 const parseAmountInput = (value: string) => {
   if (!value.trim()) return null
-  const parsed = Number(value.replace(',', '.'))
-  if (!Number.isFinite(parsed) || parsed < 0) return null
-  return Math.round(parsed * 100)
+  return parseCurrencyAmountToCents(value, { allowZero: true })
 }
 
 const TransactionsPage = () => {
