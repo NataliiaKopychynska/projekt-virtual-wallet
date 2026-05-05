@@ -1,10 +1,5 @@
 import type { TransactionType } from '../../services/transactionsService'
 
-export const quickActions = [
-  { icon: '↑', label: 'Wyślij' },
-  { icon: '↓', label: 'Odbierz' },
-]
-
 export const expenseCategories = [
   'Zakupy',
   'Dom',

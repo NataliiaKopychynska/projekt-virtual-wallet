@@ -4,7 +4,7 @@ import AppShell from '../../components/AppShell/AppShell'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePreferences } from '../../contexts/PreferencesContext'
 import { formatCurrencyValue } from '../../features/preferences/preferences'
-import { expenseCategories, incomeCategories, quickActions } from '../../features/transactions/constants'
+import { expenseCategories, incomeCategories } from '../../features/transactions/constants'
 import {
   formatAmount,
   formatTransactionDate,
@@ -211,7 +211,7 @@ const DashboardPage = () => {
   }
 
   return (
-    <AppShell title="Pulpit" subtitle="Saldo, szybkie akcje i ostatnie ruchy na koncie.">
+    <AppShell title="Pulpit" subtitle="Saldo, formularz transakcji i ostatnie ruchy na koncie.">
       <div className="dashboard-page">
         {toastMessage && (
           <div className="dashboard-page__flash-message" role="status" aria-live="polite">
@@ -332,18 +332,6 @@ const DashboardPage = () => {
               )}
             </div>
           </form>
-        </section>
-
-        <section className="dashboard-page__section">
-          <h2 className="dashboard-page__section-title">Szybkie akcje</h2>
-          <div className="dashboard-page__actions">
-            {quickActions.map((action) => (
-              <button key={action.label} className="dashboard-page__action-btn">
-                <span className="dashboard-page__action-icon">{action.icon}</span>
-                <span className="dashboard-page__action-label">{action.label}</span>
-              </button>
-            ))}
-          </div>
         </section>
 
         <section className="dashboard-page__section">

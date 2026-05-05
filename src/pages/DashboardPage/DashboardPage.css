@@ -1,5 +1,5 @@
 .dashboard-page {
-  max-width: 860px;
+  width: 100%;
 }
 
 .dashboard-page__flash-message {
@@ -209,47 +209,6 @@
   color: var(--text-primary);
 }
 
-.dashboard-page__actions {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
-}
-
-.dashboard-page__action-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 0.5rem;
-  background: var(--surface-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  transition: background 0.2s, transform 0.15s;
-}
-
-.dashboard-page__action-btn:hover {
-  background: var(--surface-hover);
-  transform: translateY(-2px);
-}
-
-.dashboard-page__action-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--accent-soft);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.125rem;
-  color: var(--accent-text);
-}
-
-.dashboard-page__action-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
 .dashboard-page__transactions {
   list-style: none;
   display: flex;
@@ -355,11 +314,6 @@
 @media (max-width: 768px) {
   .dashboard-page__balance-amount {
     font-size: 1.75rem;
-  }
-
-  .dashboard-page__actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
   }
 
   .dashboard-page__transaction-form {
