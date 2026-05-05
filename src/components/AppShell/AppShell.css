@@ -14,7 +14,17 @@
   padding: 2rem 1.25rem;
   position: sticky;
   top: 0;
+  z-index: 5;
   height: 100vh;
+  overflow: visible;
+  transition:
+    width 0.2s ease,
+    padding 0.2s ease;
+}
+
+.app-shell__sidebar--collapsed {
+  width: 76px;
+  padding-inline: 0.875rem;
 }
 
 .app-shell__brand {
@@ -23,6 +33,14 @@
   gap: 0.625rem;
   margin-bottom: 2.5rem;
   padding-left: 0.25rem;
+  padding-right: 1rem;
+}
+
+.app-shell__brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
 }
 
 .app-shell__brand-icon {
@@ -31,6 +49,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  flex: 0 0 auto;
 }
 
 .app-shell__brand-name {
@@ -38,6 +57,38 @@
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.app-shell__sidebar-toggle {
+  position: absolute;
+  top: 1.875rem;
+  right: -11px;
+  z-index: 2;
+  width: 22px;
+  height: 48px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: var(--text-tertiary);
+  background: var(--surface-sidebar);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+  font-size: 1rem;
+  line-height: 1;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    right 0.2s;
+}
+
+.app-shell__sidebar-toggle:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
 }
 
 .app-shell__nav {
@@ -51,12 +102,17 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-height: 42px;
   padding: 0.75rem 1rem;
   border-radius: 10px;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-tertiary);
-  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    padding 0.2s;
 }
 
 .app-shell__nav-item:hover {
@@ -73,19 +129,68 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-height: 42px;
   padding: 0.75rem 1rem;
   border-radius: 10px;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-muted);
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
   width: 100%;
   text-align: left;
+  white-space: nowrap;
 }
 
 .app-shell__logout-btn:hover {
   background: var(--danger-soft);
   color: var(--danger-text);
+}
+
+.app-shell__nav-icon {
+  width: 1.125rem;
+  flex: 0 0 1.125rem;
+  display: inline-flex;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.app-shell__nav-label {
+  overflow: hidden;
+  text-overflow: clip;
+  transition: opacity 0.15s ease;
+}
+
+.app-shell__sidebar--collapsed .app-shell__brand {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.app-shell__sidebar--collapsed .app-shell__brand-lockup {
+  gap: 0;
+}
+
+.app-shell__sidebar--collapsed .app-shell__nav-item,
+.app-shell__sidebar--collapsed .app-shell__logout-btn {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0;
+}
+
+.app-shell__sidebar--collapsed .app-shell__brand-name,
+.app-shell__sidebar--collapsed .app-shell__nav-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .app-shell__main {

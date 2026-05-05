@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import './AppShell.css'
@@ -9,9 +9,35 @@ interface AppShellProps {
   children: ReactNode
 }
 
+const SIDEBAR_STORAGE_KEY = 'vw_app_shell_sidebar_collapsed'
+
+const navItems = [
+  { to: '/home/dashboard', icon: '⊞', label: 'Pulpit' },
+  { to: '/home/transactions', icon: '↔', label: 'Transakcje' },
+  { to: '/home/analytics', icon: '◑', label: 'Analityka' },
+  { to: '/home/settings', icon: '⚙', label: 'Ustawienia' },
+]
+
+const loadSidebarCollapsedState = () => {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  return window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true'
+}
+
 const AppShell = ({ title, subtitle, children }: AppShellProps) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(loadSidebarCollapsedState)
+
+  useEffect(() => {
+    window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(isSidebarCollapsed))
+  }, [isSidebarCollapsed])
+
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed((current) => !current)
+  }
 
   const handleOpenSettings = () => {
     navigate('/home/settings')
@@ -24,49 +50,48 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
 
   return (
     <div className="app-shell">
-      <aside className="app-shell__sidebar">
+      <aside
+        className={`app-shell__sidebar${isSidebarCollapsed ? ' app-shell__sidebar--collapsed' : ''}`}
+      >
         <div className="app-shell__brand">
-          <span className="app-shell__brand-icon">◈</span>
-          <span className="app-shell__brand-name">Virtual Wallet</span>
+          <div className="app-shell__brand-lockup">
+            <span className="app-shell__brand-icon">◈</span>
+            <span className="app-shell__brand-name">Virtual Wallet</span>
+          </div>
         </div>
+        <button
+          type="button"
+          className="app-shell__sidebar-toggle"
+          onClick={handleToggleSidebar}
+          aria-label={isSidebarCollapsed ? 'Rozwiń panel boczny' : 'Zwiń panel boczny'}
+          title={isSidebarCollapsed ? 'Rozwiń panel boczny' : 'Zwiń panel boczny'}
+        >
+          <span aria-hidden="true">{isSidebarCollapsed ? '›' : '‹'}</span>
+        </button>
 
         <nav className="app-shell__nav" aria-label="Główna nawigacja">
-          <NavLink
-            to="/home/dashboard"
-            className={({ isActive }) =>
-              `app-shell__nav-item${isActive ? ' app-shell__nav-item--active' : ''}`
-            }
-          >
-            <span>⊞</span> Pulpit
-          </NavLink>
-          <NavLink
-            to="/home/transactions"
-            className={({ isActive }) =>
-              `app-shell__nav-item${isActive ? ' app-shell__nav-item--active' : ''}`
-            }
-          >
-            <span>↔</span> Transakcje
-          </NavLink>
-          <NavLink
-            to="/home/analytics"
-            className={({ isActive }) =>
-              `app-shell__nav-item${isActive ? ' app-shell__nav-item--active' : ''}`
-            }
-          >
-            <span>◑</span> Analityka
-          </NavLink>
-          <NavLink
-            to="/home/settings"
-            className={({ isActive }) =>
-              `app-shell__nav-item${isActive ? ' app-shell__nav-item--active' : ''}`
-            }
-          >
-            <span>⚙</span> Ustawienia
-          </NavLink>
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `app-shell__nav-item${isActive ? ' app-shell__nav-item--active' : ''}`
+              }
+              title={item.label}
+            >
+              <span className="app-shell__nav-icon" aria-hidden="true">
+                {item.icon}
+              </span>
+              <span className="app-shell__nav-label">{item.label}</span>
+            </NavLink>
+          ))}
         </nav>
 
-        <button className="app-shell__logout-btn" onClick={handleLogout}>
-          <span>⏻</span> Wyloguj
+        <button className="app-shell__logout-btn" onClick={handleLogout} title="Wyloguj">
+          <span className="app-shell__nav-icon" aria-hidden="true">
+            ⏻
+          </span>
+          <span className="app-shell__nav-label">Wyloguj</span>
         </button>
       </aside>
 
@@ -102,38 +127,17 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
         </header>
 
         <nav className="app-shell__mobile-nav" aria-label="Mobilna nawigacja">
-          <NavLink
-            to="/home/dashboard"
-            className={({ isActive }) =>
-              `app-shell__mobile-nav-item${isActive ? ' app-shell__mobile-nav-item--active' : ''}`
-            }
-          >
-            Pulpit
-          </NavLink>
-          <NavLink
-            to="/home/transactions"
-            className={({ isActive }) =>
-              `app-shell__mobile-nav-item${isActive ? ' app-shell__mobile-nav-item--active' : ''}`
-            }
-          >
-            Transakcje
-          </NavLink>
-          <NavLink
-            to="/home/analytics"
-            className={({ isActive }) =>
-              `app-shell__mobile-nav-item${isActive ? ' app-shell__mobile-nav-item--active' : ''}`
-            }
-          >
-            Analityka
-          </NavLink>
-          <NavLink
-            to="/home/settings"
-            className={({ isActive }) =>
-              `app-shell__mobile-nav-item${isActive ? ' app-shell__mobile-nav-item--active' : ''}`
-            }
-          >
-            Ustawienia
-          </NavLink>
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `app-shell__mobile-nav-item${isActive ? ' app-shell__mobile-nav-item--active' : ''}`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
         </nav>
 
         {children}
