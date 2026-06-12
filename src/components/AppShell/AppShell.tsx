@@ -1,6 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { useTranslation } from '../../features/i18n/useTranslation'
+import type { TranslationKey } from '../../features/i18n/translations'
 import './AppShell.css'
 
 interface AppShellProps {
@@ -11,11 +13,11 @@ interface AppShellProps {
 
 const SIDEBAR_STORAGE_KEY = 'vw_app_shell_sidebar_collapsed'
 
-const navItems = [
-  { to: '/home/dashboard', icon: '⊞', label: 'Pulpit' },
-  { to: '/home/transactions', icon: '↔', label: 'Transakcje' },
-  { to: '/home/analytics', icon: '◑', label: 'Analityka' },
-  { to: '/home/settings', icon: '⚙', label: 'Ustawienia' },
+const navItems: Array<{ to: string; icon: string; labelKey: TranslationKey }> = [
+  { to: '/home/dashboard', icon: '⊞', labelKey: 'nav.dashboard' },
+  { to: '/home/transactions', icon: '↔', labelKey: 'nav.transactions' },
+  { to: '/home/analytics', icon: '◑', labelKey: 'nav.analytics' },
+  { to: '/home/settings', icon: '⚙', labelKey: 'nav.settings' },
 ]
 
 const loadSidebarCollapsedState = () => {
@@ -28,6 +30,7 @@ const loadSidebarCollapsedState = () => {
 
 const AppShell = ({ title, subtitle, children }: AppShellProps) => {
   const { user, logout } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(loadSidebarCollapsedState)
 
@@ -64,14 +67,14 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
           type="button"
           className="app-shell__sidebar-toggle"
           onClick={handleToggleSidebar}
-          aria-label={isSidebarCollapsed ? 'Rozwiń panel boczny' : 'Zwiń panel boczny'}
-          title={isSidebarCollapsed ? 'Rozwiń panel boczny' : 'Zwiń panel boczny'}
+          aria-label={isSidebarCollapsed ? t('appShell.expandSidebar') : t('appShell.collapseSidebar')}
+          title={isSidebarCollapsed ? t('appShell.expandSidebar') : t('appShell.collapseSidebar')}
           data-testid="app-shell-sidebar-toggle"
         >
           <span aria-hidden="true">{isSidebarCollapsed ? '›' : '‹'}</span>
         </button>
 
-        <nav className="app-shell__nav" aria-label="Główna nawigacja">
+        <nav className="app-shell__nav" aria-label={t('appShell.mainNav')}>
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -79,12 +82,12 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
               className={({ isActive }) =>
                 `app-shell__nav-item${isActive ? ' app-shell__nav-item--active' : ''}`
               }
-              title={item.label}
+              title={t(item.labelKey)}
             >
               <span className="app-shell__nav-icon" aria-hidden="true">
                 {item.icon}
               </span>
-              <span className="app-shell__nav-label">{item.label}</span>
+              <span className="app-shell__nav-label">{t(item.labelKey)}</span>
             </NavLink>
           ))}
         </nav>
@@ -92,20 +95,20 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
         <button
           className="app-shell__logout-btn"
           onClick={handleLogout}
-          title="Wyloguj"
+          title={t('common.logout')}
           data-testid="app-shell-logout-button"
         >
           <span className="app-shell__nav-icon" aria-hidden="true">
             ⏻
           </span>
-          <span className="app-shell__nav-label">Wyloguj</span>
+          <span className="app-shell__nav-label">{t('common.logout')}</span>
         </button>
       </aside>
 
       <main className="app-shell__main">
         <header className="app-shell__topbar">
           <div>
-            <p className="app-shell__greeting">Dzień dobry,</p>
+            <p className="app-shell__greeting">{t('appShell.greeting')}</p>
             <h1 className="app-shell__title">{user?.givenName ?? user?.username} 👋</h1>
             <p className="app-shell__subtitle">{subtitle}</p>
           </div>
@@ -117,7 +120,7 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
             <button
               className="app-shell__avatar-btn"
               onClick={handleOpenSettings}
-              title="Przejdź do ustawień"
+              title={t('appShell.goToSettings')}
             >
               {user?.avatarURL ? (
                 <img
@@ -133,7 +136,7 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
           </div>
         </header>
 
-        <nav className="app-shell__mobile-nav" aria-label="Mobilna nawigacja">
+        <nav className="app-shell__mobile-nav" aria-label={t('appShell.mobileNav')}>
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -142,7 +145,7 @@ const AppShell = ({ title, subtitle, children }: AppShellProps) => {
                 `app-shell__mobile-nav-item${isActive ? ' app-shell__mobile-nav-item--active' : ''}`
               }
             >
-              {item.label}
+              {t(item.labelKey)}
             </NavLink>
           ))}
         </nav>

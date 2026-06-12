@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { useTranslation } from '../../features/i18n/useTranslation'
 import loginBgDesktop from '../../images/backgrounds/login-bg-d.jpg'
 import loginBgTablet from '../../images/backgrounds/login-bg-t.jpg'
 import loginBgMobile from '../../images/backgrounds/register&login-bg-m.jpg'
@@ -15,6 +16,7 @@ const RegisterPage = () => {
   const [redirectToHome, setRedirectToHome] = useState(false)
   const [flashMessage, setFlashMessage] = useState('')
   const { registerWithEmail, loginWithGoogle, isLoading, user } = useAuth()
+  const { t } = useTranslation()
 
   const validateEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
   const validatePassword = (value: string) =>
@@ -26,21 +28,21 @@ const RegisterPage = () => {
     setInfo('')
 
     if (!validateEmail(email)) {
-      setError('Podaj poprawny adres email.')
+      setError(t('register.errorEmail'))
       return
     }
 
     if (!validatePassword(password)) {
-      setError('Hasło musi mieć min. 8 znaków, wielką literę, cyfrę i znak specjalny.')
+      setError(t('register.errorPassword'))
       return
     }
 
     if (password !== repeat) {
-      setError('Hasła nie są takie same.')
+      setError(t('register.errorMismatch'))
       return
     }
 
-    const successMessage = 'Konto zarejestrowane pomyślnie'
+    const successMessage = t('register.success')
     try {
       sessionStorage.setItem('vw_toast_message', successMessage)
       await registerWithEmail(email, password)
@@ -48,7 +50,7 @@ const RegisterPage = () => {
       setRedirectToHome(true)
     } catch (err: unknown) {
       sessionStorage.removeItem('vw_toast_message')
-      const message = err instanceof Error ? err.message : 'Wystąpił błąd rejestracji.'
+      const message = err instanceof Error ? err.message : t('register.errorGeneric')
       setError(message)
     }
   }
@@ -56,7 +58,7 @@ const RegisterPage = () => {
   const handleGoogleRegister = async () => {
     setError('')
     setInfo('')
-    const successMessage = 'Konto zarejestrowane pomyślnie'
+    const successMessage = t('register.success')
     try {
       sessionStorage.setItem('vw_toast_message', successMessage)
       await loginWithGoogle()
@@ -64,8 +66,7 @@ const RegisterPage = () => {
       setRedirectToHome(true)
     } catch (err: unknown) {
       sessionStorage.removeItem('vw_toast_message')
-      const message =
-        err instanceof Error ? err.message : 'Nie udało się zarejestrować przez Google.'
+      const message = err instanceof Error ? err.message : t('register.errorGoogle')
       setError(message)
     }
   }
@@ -94,16 +95,16 @@ const RegisterPage = () => {
             <span className="login-page__logo-icon">◈</span>
           </div>
           <h1 className="login-page__title">Virtual Wallet</h1>
-          <p className="login-page__subtitle">Twój cyfrowy portfel</p>
+          <p className="login-page__subtitle">{t('appShell.tagline')}</p>
         </div>
 
         <div className="login-page__body">
-          <p className="login-page__welcome">Utwórz konto</p>
-          <p className="login-page__description">Zarejestruj się, aby zarządzać swoimi finansami</p>
+          <p className="login-page__welcome">{t('register.welcome')}</p>
+          <p className="login-page__description">{t('register.description')}</p>
 
           <form className="login-page__form" onSubmit={handleRegister} noValidate>
             <label className="login-page__field-label" htmlFor="email">
-              Email
+              {t('common.email')}
             </label>
             <input
               id="email"
@@ -111,13 +112,13 @@ const RegisterPage = () => {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="twoj@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               autoComplete="email"
               required
             />
 
             <label className="login-page__field-label" htmlFor="password">
-              Hasło
+              {t('common.password')}
             </label>
             <input
               id="password"
@@ -125,13 +126,13 @@ const RegisterPage = () => {
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Wpisz hasło"
+              placeholder={t('auth.passwordPlaceholder')}
               autoComplete="new-password"
               required
             />
 
             <label className="login-page__field-label" htmlFor="repeat">
-              Powtórz hasło
+              {t('register.repeat')}
             </label>
             <input
               id="repeat"
@@ -139,7 +140,7 @@ const RegisterPage = () => {
               type="password"
               value={repeat}
               onChange={(event) => setRepeat(event.target.value)}
-              placeholder="Powtórz hasło"
+              placeholder={t('register.repeat')}
               autoComplete="new-password"
               required
             />
@@ -150,14 +151,14 @@ const RegisterPage = () => {
               disabled={isLoading}
               data-testid="register-submit-button"
             >
-              {isLoading ? 'Rejestruję...' : 'Zarejestruj się'}
+              {isLoading ? t('register.submitting') : t('register.submit')}
             </button>
           </form>
 
-          {isLoading && <div className="login-page__spinner" aria-label="Ładowanie..." />}
+          {isLoading && <div className="login-page__spinner" aria-label={t('common.loading')} />}
 
           <div className="login-page__divider">
-            <span>lub</span>
+            <span>{t('common.or')}</span>
           </div>
 
           <button
@@ -186,7 +187,7 @@ const RegisterPage = () => {
                 />
               </svg>
             </span>
-            Zarejestruj przez Google
+            {t('register.google')}
           </button>
 
           {error && (
@@ -207,9 +208,9 @@ const RegisterPage = () => {
           )}
 
           <p className="login-page__register-prompt">
-            Masz już konto?{' '}
+            {t('register.haveAccount')}{' '}
             <Link to="/login" className="login-page__register-link">
-              Zaloguj się
+              {t('register.loginLink')}
             </Link>
           </p>
         </div>

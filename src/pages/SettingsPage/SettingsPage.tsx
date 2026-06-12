@@ -8,10 +8,11 @@ import {
   defaultPreferences,
   formatCurrencyValue,
   formatDateByPreference,
-  getAuthProviderLabel,
   localeOptions,
   themeOptions,
 } from '../../features/preferences/preferences'
+import { useTranslation } from '../../features/i18n/useTranslation'
+import type { TranslationKey } from '../../features/i18n/translations'
 import './SettingsPage.css'
 
 interface ProfileFormState {
@@ -27,6 +28,7 @@ interface PasswordFormState {
 const SettingsPage = () => {
   const { user, updateUserProfile, changePassword } = useAuth()
   const { preferences, updatePreferences, resolvedTheme } = usePreferences()
+  const { t } = useTranslation()
   const [profileState, setProfileState] = useState<ProfileFormState>({
     username: user?.username ?? '',
     avatarURL: user?.avatarURL ?? '',
@@ -83,7 +85,7 @@ const SettingsPage = () => {
     () => formatCurrencyValue(2499.5, preferencesState),
     [preferencesState],
   )
-  const authProviderLabel = getAuthProviderLabel(user?.authProvider ?? 'unknown')
+  const authProviderLabel = t(`auth.provider.${user?.authProvider ?? 'unknown'}` as TranslationKey)
 
   const handleSaveProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -93,13 +95,13 @@ const SettingsPage = () => {
     const avatarURL = profileState.avatarURL.trim()
 
     if (!username) {
-      setProfileError('Imię lub nazwa użytkownika jest wymagana.')
+      setProfileError(t('settings.errorUsernameRequired'))
       setProfileToast('')
       return
     }
 
     if (avatarURL && !/^https?:\/\/.+/i.test(avatarURL)) {
-      setProfileError('Avatar musi być poprawnym adresem URL zaczynającym się od http lub https.')
+      setProfileError(t('settings.errorAvatarUrl'))
       setProfileToast('')
       return
     }
@@ -110,10 +112,10 @@ const SettingsPage = () => {
 
     try {
       await updateUserProfile({ username, avatarURL })
-      setProfileToast('Dane profilu zostały zapisane.')
+      setProfileToast(t('settings.profileSaved'))
     } catch (error) {
       console.error('Saving profile settings failed:', error)
-      setProfileError('Nie udało się zapisać zmian profilu.')
+      setProfileError(t('settings.profileSaveError'))
     } finally {
       setIsSavingProfile(false)
     }
@@ -129,10 +131,10 @@ const SettingsPage = () => {
 
     try {
       updatePreferences(preferencesState)
-      setPreferencesToast('Preferencje zapisane pomyślnie.')
+      setPreferencesToast(t('settings.prefsSaved'))
     } catch (error) {
       console.error('Saving app preferences failed:', error)
-      setPreferencesError('Nie udało się zapisać preferencji.')
+      setPreferencesError(t('settings.prefsSaveError'))
     } finally {
       setIsSavingPreferences(false)
     }
@@ -150,19 +152,19 @@ const SettingsPage = () => {
     if (isSavingPassword) return
 
     if (user?.authProvider !== 'password') {
-      setSecurityError('To konto nie korzysta z lokalnego hasła.')
+      setSecurityError(t('settings.errorNoPassword'))
       setSecurityMessage('')
       return
     }
 
     if (passwordState.nextPassword.length < 6) {
-      setSecurityError('Nowe hasło musi mieć minimum 6 znaków.')
+      setSecurityError(t('settings.errorPasswordShort'))
       setSecurityMessage('')
       return
     }
 
     if (passwordState.nextPassword !== passwordState.repeatPassword) {
-      setSecurityError('Hasła nie są identyczne.')
+      setSecurityError(t('settings.errorPasswordMismatch'))
       setSecurityMessage('')
       return
     }
@@ -174,22 +176,17 @@ const SettingsPage = () => {
     try {
       await changePassword(passwordState.nextPassword)
       setPasswordState({ nextPassword: '', repeatPassword: '' })
-      setSecurityMessage('Hasło zostało zmienione.')
+      setSecurityMessage(t('settings.passwordChanged'))
     } catch (error) {
       console.error('Changing password failed:', error)
-      setSecurityError(
-        'Nie udało się zmienić hasła. Jeśli logowanie było dawno temu, wyloguj się i zaloguj ponownie albo użyj resetu hasła.',
-      )
+      setSecurityError(t('settings.passwordChangeError'))
     } finally {
       setIsSavingPassword(false)
     }
   }
 
   return (
-    <AppShell
-      title="Ustawienia"
-      subtitle="Zarządzaj profilem, bezpieczeństwem i sposobem prezentacji danych."
-    >
+    <AppShell title={t('nav.settings')} subtitle={t('settings.subtitle')}>
       <div className="settings-page" data-testid="settings-page">
         {profileToast && (
           <div className="settings-page__toast" role="status" aria-live="polite">
@@ -198,7 +195,7 @@ const SettingsPage = () => {
               type="button"
               className="settings-page__toast-close"
               onClick={() => setProfileToast('')}
-              aria-label="Zamknij komunikat"
+              aria-label={t('settings.closeMessage')}
             >
               OK
             </button>
@@ -212,7 +209,7 @@ const SettingsPage = () => {
               type="button"
               className="settings-page__toast-close"
               onClick={() => setPreferencesToast('')}
-              aria-label="Zamknij komunikat"
+              aria-label={t('settings.closeMessage')}
             >
               OK
             </button>
@@ -221,17 +218,19 @@ const SettingsPage = () => {
 
         <section className="settings-page__hero">
           <div>
-            <p className="settings-page__eyebrow">Account Center</p>
-            <h2 className="settings-page__hero-title">Ustawienia konta i aplikacji</h2>
-            <p className="settings-page__hero-copy">
-              Tu zmienisz dane profilu, sposób logowania oraz format prezentacji kwot i dat w
-              aplikacji.
-            </p>
+            <p className="settings-page__eyebrow">{t('settings.heroEyebrow')}</p>
+            <h2 className="settings-page__hero-title">{t('settings.heroTitle')}</h2>
+            <p className="settings-page__hero-copy">{t('settings.heroCopy')}</p>
           </div>
 
           <div className="settings-page__hero-meta">
             <span className="settings-page__hero-chip">
-              Motyw: {resolvedTheme === 'dark' ? 'ciemny' : 'jasny'}
+              {t('settings.themeChip', {
+                theme:
+                  resolvedTheme === 'dark'
+                    ? t('settings.themeDarkLower')
+                    : t('settings.themeLightLower'),
+              })}
             </span>
           </div>
         </section>
@@ -240,8 +239,8 @@ const SettingsPage = () => {
           <section className="settings-page__card settings-page__card--profile">
             <div className="settings-page__card-head">
               <div>
-                <p className="settings-page__section-eyebrow">Profil</p>
-                <h3 className="settings-page__section-title">Dane użytkownika</h3>
+                <p className="settings-page__section-eyebrow">{t('settings.profileEyebrow')}</p>
+                <h3 className="settings-page__section-title">{t('settings.profileTitle')}</h3>
               </div>
             </div>
 
@@ -261,7 +260,7 @@ const SettingsPage = () => {
 
               <div>
                 <strong className="settings-page__profile-name">
-                  {profileState.username.trim() || user?.username || 'Uzytkownik'}
+                  {profileState.username.trim() || user?.username || t('settings.defaultUser')}
                 </strong>
                 <p className="settings-page__profile-meta">{user?.email}</p>
               </div>
@@ -269,19 +268,19 @@ const SettingsPage = () => {
 
             <form className="settings-page__form" onSubmit={handleSaveProfile}>
               <label className="settings-page__field">
-                <span>Imię lub nazwa użytkownika</span>
+                <span>{t('settings.usernameLabel')}</span>
                 <input
                   type="text"
                   value={profileState.username}
                   onChange={(event) =>
                     setProfileState((current) => ({ ...current, username: event.target.value }))
                   }
-                  placeholder="Np. Karol Szwedo"
+                  placeholder={t('settings.usernamePlaceholder')}
                 />
               </label>
 
               <label className="settings-page__field">
-                <span>Avatar URL</span>
+                <span>{t('settings.avatarUrlLabel')}</span>
                 <input
                   type="url"
                   value={profileState.avatarURL}
@@ -293,12 +292,12 @@ const SettingsPage = () => {
               </label>
 
               <label className="settings-page__field">
-                <span>Email</span>
+                <span>{t('common.email')}</span>
                 <input type="email" value={user?.email ?? ''} disabled />
               </label>
 
               <label className="settings-page__field">
-                <span>Metoda logowania</span>
+                <span>{t('settings.authMethod')}</span>
                 <input type="text" value={authProviderLabel} disabled />
               </label>
 
@@ -314,7 +313,7 @@ const SettingsPage = () => {
                   className="settings-page__primary-btn"
                   disabled={isSavingProfile}
                 >
-                  {isSavingProfile ? 'Zapisywanie...' : 'Zapisz profil'}
+                  {isSavingProfile ? t('common.saving') : t('settings.saveProfile')}
                 </button>
               </div>
             </form>
@@ -323,15 +322,15 @@ const SettingsPage = () => {
           <section className="settings-page__card">
             <div className="settings-page__card-head">
               <div>
-                <p className="settings-page__section-eyebrow">Bezpieczeństwo</p>
-                <h3 className="settings-page__section-title">Dostęp do konta</h3>
+                <p className="settings-page__section-eyebrow">{t('settings.securityEyebrow')}</p>
+                <h3 className="settings-page__section-title">{t('settings.securityTitle')}</h3>
               </div>
             </div>
 
             {user?.authProvider === 'password' ? (
               <form className="settings-page__form" onSubmit={handleChangePassword}>
                 <label className="settings-page__field">
-                  <span>Nowe hasło</span>
+                  <span>{t('settings.newPassword')}</span>
                   <input
                     type="password"
                     value={passwordState.nextPassword}
@@ -341,13 +340,13 @@ const SettingsPage = () => {
                         nextPassword: event.target.value,
                       }))
                     }
-                    placeholder="Minimum 6 znaków"
+                    placeholder={t('settings.min6')}
                     autoComplete="new-password"
                   />
                 </label>
 
                 <label className="settings-page__field">
-                  <span>Powtórz nowe hasło</span>
+                  <span>{t('settings.repeatNewPassword')}</span>
                   <input
                     type="password"
                     value={passwordState.repeatPassword}
@@ -357,7 +356,7 @@ const SettingsPage = () => {
                         repeatPassword: event.target.value,
                       }))
                     }
-                    placeholder="Powtórz hasło"
+                    placeholder={t('settings.repeatPassword')}
                     autoComplete="new-password"
                   />
                 </label>
@@ -379,16 +378,13 @@ const SettingsPage = () => {
                     className="settings-page__primary-btn"
                     disabled={isSavingPassword}
                   >
-                    {isSavingPassword ? 'Zapisywanie...' : 'Zmień hasło'}
+                    {isSavingPassword ? t('common.saving') : t('settings.changePassword')}
                   </button>
                 </div>
               </form>
             ) : (
               <div className="settings-page__info-block">
-                <p className="settings-page__info-copy">
-                  To konto nie korzysta z lokalnego hasła, więc zmiana hasła nie jest dostępna z
-                  poziomu aplikacji.
-                </p>
+                <p className="settings-page__info-copy">{t('settings.noPasswordInfo')}</p>
                 {securityError && (
                   <p className="settings-page__feedback settings-page__feedback--error">
                     {securityError}
@@ -406,8 +402,8 @@ const SettingsPage = () => {
           <section className="settings-page__card settings-page__card--wide">
             <div className="settings-page__card-head">
               <div>
-                <p className="settings-page__section-eyebrow">Aplikacja</p>
-                <h3 className="settings-page__section-title">Preferencje interfejsu</h3>
+                <p className="settings-page__section-eyebrow">{t('settings.appEyebrow')}</p>
+                <h3 className="settings-page__section-title">{t('settings.prefsTitle')}</h3>
               </div>
             </div>
 
@@ -418,7 +414,7 @@ const SettingsPage = () => {
             >
               <div className="settings-page__preferences-grid">
                 <label className="settings-page__field">
-                  <span>Waluta</span>
+                  <span>{t('settings.currency')}</span>
                   <select
                     value={preferencesState.currency}
                     onChange={(event) =>
@@ -431,14 +427,14 @@ const SettingsPage = () => {
                   >
                     {currencyOptions.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(`currency.${option.value}` as TranslationKey)}
                       </option>
                     ))}
                   </select>
                 </label>
 
                 <label className="settings-page__field">
-                  <span>Język i locale</span>
+                  <span>{t('settings.language')}</span>
                   <select
                     value={preferencesState.locale}
                     onChange={(event) =>
@@ -457,7 +453,7 @@ const SettingsPage = () => {
                 </label>
 
                 <label className="settings-page__field">
-                  <span>Format daty</span>
+                  <span>{t('settings.dateFormat')}</span>
                   <select
                     value={preferencesState.dateFormat}
                     onChange={(event) =>
@@ -476,7 +472,7 @@ const SettingsPage = () => {
                 </label>
 
                 <label className="settings-page__field">
-                  <span>Motyw</span>
+                  <span>{t('settings.theme')}</span>
                   <select
                     value={preferencesState.theme}
                     onChange={(event) =>
@@ -489,7 +485,7 @@ const SettingsPage = () => {
                   >
                     {themeOptions.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(`theme.${option.value}` as TranslationKey)}
                       </option>
                     ))}
                   </select>
@@ -497,7 +493,7 @@ const SettingsPage = () => {
               </div>
 
               <div className="settings-page__preview-card">
-                <span className="settings-page__preview-label">Podgląd formatowania</span>
+                <span className="settings-page__preview-label">{t('settings.previewLabel')}</span>
                 <strong>{previewAmount}</strong>
                 <span>{previewDate}</span>
               </div>
@@ -515,14 +511,14 @@ const SettingsPage = () => {
                   disabled={isSavingPreferences}
                   data-testid="preferences-submit-button"
                 >
-                  {isSavingPreferences ? 'Zapisywanie...' : 'Zapisz preferencje'}
+                  {isSavingPreferences ? t('common.saving') : t('settings.savePrefs')}
                 </button>
                 <button
                   type="button"
                   className="settings-page__secondary-btn"
                   onClick={handleResetPreferences}
                 >
-                  Przywróć domyślne
+                  {t('settings.resetDefaults')}
                 </button>
               </div>
             </form>

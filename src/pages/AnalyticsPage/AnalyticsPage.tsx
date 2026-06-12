@@ -28,6 +28,8 @@ import {
   formatDateByPreference,
   formatPercent,
 } from '../../features/preferences/preferences'
+import { useTranslation } from '../../features/i18n/useTranslation'
+import type { TranslationKey } from '../../features/i18n/translations'
 import { formatAbsoluteAmount, formatTransactionDate } from '../../features/transactions/utils'
 import { subscribeToTransactions, type Transaction } from '../../services/transactionsService'
 import './AnalyticsPage.css'
@@ -42,14 +44,27 @@ const toTooltipNumber = (value: number | string | ReadonlyArray<string | number>
   return Number(value ?? 0)
 }
 
-const formatDateRange = (start: Date | null, end: Date, formatter: (value: Date) => string) => {
-  if (!start) return 'Brak danych'
+const formatDateRange = (
+  start: Date | null,
+  end: Date,
+  formatter: (value: Date) => string,
+  noDataLabel: string,
+) => {
+  if (!start) return noDataLabel
   return `${formatter(start)} - ${formatter(end)}`
+}
+
+const rangeOptionKeys: Record<AnalyticsRange, TranslationKey> = {
+  '30d': 'analytics.range.30d',
+  '90d': 'analytics.range.90d',
+  '12m': 'analytics.range.12m',
+  all: 'analytics.range.all',
 }
 
 const AnalyticsPage = () => {
   const { user } = useAuth()
   const { preferences, resolvedTheme } = usePreferences()
+  const { t, tCategory } = useTranslation()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [range, setRange] = useState<AnalyticsRange>('90d')
   const [isLoading, setIsLoading] = useState(true)
@@ -67,7 +82,7 @@ const AnalyticsPage = () => {
       },
       (error) => {
         console.error('Analytics transaction subscription failed:', error)
-        setErrorMessage('Nie udało się pobrać danych analitycznych.')
+        setErrorMessage(t('analytics.fetchError'))
         setIsLoading(false)
       },
     )
@@ -81,18 +96,20 @@ const AnalyticsPage = () => {
 
   const comparisonMessage = useMemo(() => {
     const comparison = analytics.summary.comparison
-    if (!comparison) return 'Porównanie do poprzedniego okresu jest dostępne dla zakresów 30 dni, 90 dni i 12 miesięcy.'
+    if (!comparison) return t('analytics.comparisonUnavailable')
 
     if (comparison.previousExpensesCents === 0) {
-      return 'Brak wydatków w poprzednim porównywalnym okresie, więc nie ma jeszcze stabilnej bazy odniesienia.'
+      return t('analytics.comparisonNoBase')
     }
 
-    const direction = comparison.expensesDiffCents > 0 ? 'wzrosły' : 'spadły'
-    return `Wydatki ${direction} o ${formatAbsoluteAmount(
-      Math.abs(comparison.expensesDiffCents),
-      preferences,
-    )} (${formatPercent(Math.abs(comparison.expensesDiffPct ?? 0), preferences.locale)}) względem poprzedniego okresu.`
-  }, [analytics.summary.comparison, preferences])
+    const direction =
+      comparison.expensesDiffCents > 0 ? t('analytics.increased') : t('analytics.decreased')
+    return t('analytics.comparisonMsg', {
+      direction,
+      amount: formatAbsoluteAmount(Math.abs(comparison.expensesDiffCents), preferences),
+      pct: formatPercent(Math.abs(comparison.expensesDiffPct ?? 0), preferences.locale),
+    })
+  }, [analytics.summary.comparison, preferences, t])
 
   const hasAnyTransactions = transactions.length > 0
   const hasRangeData = analytics.filteredTransactions.length > 0
@@ -116,29 +133,32 @@ const AnalyticsPage = () => {
   )
 
   return (
-    <AppShell title="Analityka" subtitle="Wydatki, trendy i kluczowe sygnały z historii konta.">
+    <AppShell title={t('nav.analytics')} subtitle={t('analytics.subtitle')}>
       <div className="analytics-page">
         <section className="analytics-page__hero">
           <div>
-            <p className="analytics-page__eyebrow">Financial Intelligence</p>
-            <h2 className="analytics-page__hero-title">Analityka wydatków</h2>
-            <p className="analytics-page__hero-copy">
-              Obserwuj cashflow, strukturę kosztów i tempo wydawania pieniędzy jak w bankowym dashboardzie.
-            </p>
+            <p className="analytics-page__eyebrow">{t('analytics.heroEyebrow')}</p>
+            <h2 className="analytics-page__hero-title">{t('analytics.heroTitle')}</h2>
+            <p className="analytics-page__hero-copy">{t('analytics.heroCopy')}</p>
           </div>
 
           <div className="analytics-page__hero-meta">
             <span className="analytics-page__hero-chip">
-              Zakres:{' '}
-              {formatDateRange(summary.start, summary.end, (value) =>
-                formatDateByPreference(value, preferences),
+              {t('analytics.rangeLabel')}{' '}
+              {formatDateRange(
+                summary.start,
+                summary.end,
+                (value) => formatDateByPreference(value, preferences),
+                t('common.noData'),
               )}
             </span>
-            <span className="analytics-page__hero-chip">Rekordy: {summary.transactionCount}</span>
+            <span className="analytics-page__hero-chip">
+              {t('analytics.records', { count: summary.transactionCount })}
+            </span>
           </div>
         </section>
 
-        <section className="analytics-page__range-bar" aria-label="Zakres analizy">
+        <section className="analytics-page__range-bar" aria-label={t('analytics.rangeAria')}>
           {analyticsRangeOptions.map((option) => (
             <button
               key={option.value}
@@ -148,28 +168,26 @@ const AnalyticsPage = () => {
               }`}
               onClick={() => setRange(option.value)}
             >
-              {option.label}
+              {t(rangeOptionKeys[option.value])}
             </button>
           ))}
         </section>
 
-        {isLoading && <p className="analytics-page__status">Ładowanie analityki...</p>}
+        {isLoading && <p className="analytics-page__status">{t('analytics.loading')}</p>}
         {!isLoading && errorMessage && (
           <p className="analytics-page__status analytics-page__status--error">{errorMessage}</p>
         )}
 
         {!isLoading && !errorMessage && !hasAnyTransactions && (
           <section className="analytics-page__empty">
-            <h3>Brak historii do przeanalizowania</h3>
-            <p>
-              Dodaj pierwsze transakcje, a tutaj pokażą się trendy, udział kategorii i porównania okresów.
-            </p>
+            <h3>{t('analytics.emptyTitle')}</h3>
+            <p>{t('analytics.emptyCopy')}</p>
             <div className="analytics-page__empty-actions">
               <Link to="/home/dashboard" className="analytics-page__empty-link analytics-page__empty-link--primary">
-                Dodaj transakcję
+                {t('analytics.addTx')}
               </Link>
               <Link to="/home/transactions" className="analytics-page__empty-link">
-                Zobacz historię
+                {t('analytics.seeHistory')}
               </Link>
             </div>
           </section>
@@ -179,7 +197,7 @@ const AnalyticsPage = () => {
           <>
             <section className="analytics-page__kpi-grid">
               <article className="analytics-page__kpi-card">
-                <span className="analytics-page__kpi-label">Bilans netto</span>
+                <span className="analytics-page__kpi-label">{t('analytics.net')}</span>
                 <strong
                   className={`analytics-page__kpi-value ${
                     summary.netCents >= 0
@@ -190,40 +208,38 @@ const AnalyticsPage = () => {
                   {summary.netCents >= 0 ? '+' : '-'}
                   {formatAbsoluteAmount(Math.abs(summary.netCents), preferences)}
                 </strong>
-                <p className="analytics-page__kpi-meta">Przychody minus wydatki w wybranym okresie.</p>
+                <p className="analytics-page__kpi-meta">{t('analytics.netMeta')}</p>
               </article>
 
               <article className="analytics-page__kpi-card">
-                <span className="analytics-page__kpi-label">Suma wydatków</span>
+                <span className="analytics-page__kpi-label">{t('analytics.totalExpenses')}</span>
                 <strong className="analytics-page__kpi-value">
                   {formatAbsoluteAmount(summary.expensesCents, preferences)}
                 </strong>
-                <p className="analytics-page__kpi-meta">Łączny wypływ środków dla aktywnego zakresu czasu.</p>
+                <p className="analytics-page__kpi-meta">{t('analytics.totalExpensesMeta')}</p>
               </article>
 
               <article className="analytics-page__kpi-card">
-                <span className="analytics-page__kpi-label">Suma przychodów</span>
+                <span className="analytics-page__kpi-label">{t('analytics.totalIncome')}</span>
                 <strong className="analytics-page__kpi-value analytics-page__kpi-value--positive">
                   {formatAbsoluteAmount(summary.incomeCents, preferences)}
                 </strong>
-                <p className="analytics-page__kpi-meta">Wszystkie zasilenia portfela w badanym okresie.</p>
+                <p className="analytics-page__kpi-meta">{t('analytics.totalIncomeMeta')}</p>
               </article>
 
               <article className="analytics-page__kpi-card">
-                <span className="analytics-page__kpi-label">Średni dzienny wydatek</span>
+                <span className="analytics-page__kpi-label">{t('analytics.avgDaily')}</span>
                 <strong className="analytics-page__kpi-value">
                   {formatAbsoluteAmount(summary.averageDailyExpenseCents, preferences)}
                 </strong>
-                <p className="analytics-page__kpi-meta">Uśrednione tempo wydatków dzień po dniu.</p>
+                <p className="analytics-page__kpi-meta">{t('analytics.avgDailyMeta')}</p>
               </article>
             </section>
 
             {!hasRangeData && (
               <section className="analytics-page__empty analytics-page__empty--compact">
-                <h3>Brak danych w wybranym zakresie</h3>
-                <p>
-                  Zmień zakres czasu, aby zobaczyć wykresy i insighty dla okresu, w którym pojawiły się transakcje.
-                </p>
+                <h3>{t('analytics.noRangeTitle')}</h3>
+                <p>{t('analytics.noRangeCopy')}</p>
               </section>
             )}
 
@@ -232,12 +248,10 @@ const AnalyticsPage = () => {
                 <section className="analytics-page__panel analytics-page__panel--wide">
                   <div className="analytics-page__panel-head">
                     <div>
-                      <p className="analytics-page__panel-eyebrow">Cashflow</p>
-                      <h3 className="analytics-page__panel-title">Przychody vs wydatki</h3>
+                      <p className="analytics-page__panel-eyebrow">{t('analytics.cashflowEyebrow')}</p>
+                      <h3 className="analytics-page__panel-title">{t('analytics.incomeVsExpenses')}</h3>
                     </div>
-                    <span className="analytics-page__panel-note">
-                      Miesięczny przegląd wpływów, kosztów i wyniku netto.
-                    </span>
+                    <span className="analytics-page__panel-note">{t('analytics.cashflowNote')}</span>
                   </div>
 
                   <div className="analytics-page__chart">
@@ -254,12 +268,12 @@ const AnalyticsPage = () => {
                         />
                         <Tooltip formatter={tooltipFormatter} contentStyle={tooltipContentStyle} />
                         <Legend />
-                        <Bar dataKey="income" name="Przychody" fill="#4ecdc4" radius={[10, 10, 0, 0]} />
-                        <Bar dataKey="expenses" name="Wydatki" fill="#6c63ff" radius={[10, 10, 0, 0]} />
+                        <Bar dataKey="income" name={t('analytics.income')} fill="#4ecdc4" radius={[10, 10, 0, 0]} />
+                        <Bar dataKey="expenses" name={t('analytics.expenses')} fill="#6c63ff" radius={[10, 10, 0, 0]} />
                         <Line
                           type="monotone"
                           dataKey="net"
-                          name="Netto"
+                          name={t('analytics.netLine')}
                           stroke="#ffb84d"
                           strokeWidth={3}
                           dot={false}
@@ -273,10 +287,10 @@ const AnalyticsPage = () => {
                   <article className="analytics-page__panel">
                     <div className="analytics-page__panel-head">
                       <div>
-                        <p className="analytics-page__panel-eyebrow">Kategorie</p>
-                        <h3 className="analytics-page__panel-title">Struktura wydatków</h3>
+                        <p className="analytics-page__panel-eyebrow">{t('analytics.categories')}</p>
+                        <h3 className="analytics-page__panel-title">{t('analytics.expenseStructure')}</h3>
                       </div>
-                      <span className="analytics-page__panel-note">Top 5 kategorii plus agregacja reszty.</span>
+                      <span className="analytics-page__panel-note">{t('analytics.top5Note')}</span>
                     </div>
 
                     <div className="analytics-page__chart analytics-page__chart--donut">
@@ -299,7 +313,7 @@ const AnalyticsPage = () => {
                           </PieChart>
                         </ResponsiveContainer>
                       ) : (
-                        <p className="analytics-page__chart-empty">Brak wydatków do pokazania na wykresie kategorii.</p>
+                        <p className="analytics-page__chart-empty">{t('analytics.noCategoryData')}</p>
                       )}
                     </div>
 
@@ -312,7 +326,7 @@ const AnalyticsPage = () => {
                                 className="analytics-page__legend-dot"
                                 style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
                               />
-                              {item.name}
+                              {tCategory(item.name)}
                             </span>
                             <span className="analytics-page__legend-values">
                               {formatCurrency(item.value)} • {formatPercent(item.share, preferences.locale)}
@@ -326,44 +340,52 @@ const AnalyticsPage = () => {
                   <article className="analytics-page__panel">
                     <div className="analytics-page__panel-head">
                       <div>
-                        <p className="analytics-page__panel-eyebrow">Insights</p>
-                        <h3 className="analytics-page__panel-title">Najważniejsze sygnały</h3>
+                        <p className="analytics-page__panel-eyebrow">{t('analytics.insightsEyebrow')}</p>
+                        <h3 className="analytics-page__panel-title">{t('analytics.keySignals')}</h3>
                       </div>
                     </div>
 
                     <div className="analytics-page__insights">
                       <div className="analytics-page__insight-card">
-                        <span className="analytics-page__insight-label">Najmocniejsza kategoria</span>
+                        <span className="analytics-page__insight-label">{t('analytics.topCategory')}</span>
                         <strong className="analytics-page__insight-value">
-                          {summary.topExpenseCategory?.name ?? 'Brak danych'}
+                          {summary.topExpenseCategory
+                            ? tCategory(summary.topExpenseCategory.name)
+                            : t('common.noData')}
                         </strong>
                         <p className="analytics-page__insight-copy">
                           {summary.topExpenseCategory
-                            ? `${formatCurrency(summary.topExpenseCategory.value)} • ${formatPercent(summary.topExpenseCategory.share, preferences.locale)} wszystkich wydatków.`
-                            : 'Brak wydatków w aktualnym zakresie.'}
+                            ? t('analytics.topCategoryCopy', {
+                                amount: formatCurrency(summary.topExpenseCategory.value),
+                                pct: formatPercent(
+                                  summary.topExpenseCategory.share,
+                                  preferences.locale,
+                                ),
+                              })
+                            : t('analytics.noExpensesRange')}
                         </p>
                       </div>
 
                       <div className="analytics-page__insight-card">
-                        <span className="analytics-page__insight-label">Największy pojedynczy wydatek</span>
+                        <span className="analytics-page__insight-label">{t('analytics.largestExpense')}</span>
                         <strong className="analytics-page__insight-value">
                           {summary.largestExpense
                             ? formatAbsoluteAmount(summary.largestExpense.amount, preferences)
-                            : 'Brak danych'}
+                            : t('common.noData')}
                         </strong>
                         <p className="analytics-page__insight-copy">
                           {summary.largestExpense
-                            ? `${summary.largestExpense.category} • ${summary.largestExpense.comment || 'bez opisu'} • ${formatTransactionDate(summary.largestExpense.transactionDate, preferences)}`
-                            : 'Dodaj więcej historii, aby wskazać największy koszt.'}
+                            ? `${tCategory(summary.largestExpense.category)} • ${summary.largestExpense.comment || t('analytics.noDescription')} • ${formatTransactionDate(summary.largestExpense.transactionDate, preferences)}`
+                            : t('analytics.largestExpenseEmpty')}
                         </p>
                       </div>
 
                       <div className="analytics-page__insight-card">
-                        <span className="analytics-page__insight-label">Zmiana okres do okresu</span>
+                        <span className="analytics-page__insight-label">{t('analytics.periodChange')}</span>
                         <strong className="analytics-page__insight-value">
                           {summary.comparison
                             ? `${summary.comparison.expensesDiffCents >= 0 ? '+' : '-'}${formatAbsoluteAmount(Math.abs(summary.comparison.expensesDiffCents), preferences)}`
-                            : 'Brak porównania'}
+                            : t('analytics.noComparison')}
                         </strong>
                         <p className="analytics-page__insight-copy">{comparisonMessage}</p>
                       </div>
@@ -374,12 +396,10 @@ const AnalyticsPage = () => {
                 <section className="analytics-page__panel analytics-page__panel--wide">
                   <div className="analytics-page__panel-head">
                     <div>
-                      <p className="analytics-page__panel-eyebrow">Trend</p>
-                      <h3 className="analytics-page__panel-title">Tempo wydatków w czasie</h3>
+                      <p className="analytics-page__panel-eyebrow">{t('analytics.trendEyebrow')}</p>
+                      <h3 className="analytics-page__panel-title">{t('analytics.spendingPace')}</h3>
                     </div>
-                    <span className="analytics-page__panel-note">
-                      Dla 30 i 90 dni pokazujemy dane dzienne, dla dłuższych zakresów miesięczne.
-                    </span>
+                    <span className="analytics-page__panel-note">{t('analytics.trendNote')}</span>
                   </div>
 
                   <div className="analytics-page__chart">
@@ -401,13 +421,13 @@ const AnalyticsPage = () => {
                           width={92}
                         />
                         <Tooltip
-                          formatter={(value) => tooltipFormatter(value, 'Wydatki')}
+                          formatter={(value) => tooltipFormatter(value, t('analytics.expenses'))}
                           contentStyle={tooltipContentStyle}
                         />
                         <Line
                           type="monotone"
                           dataKey="expenses"
-                          name="Wydatki"
+                          name={t('analytics.expenses')}
                           stroke="#4ecdc4"
                           strokeWidth={3}
                           dot={false}

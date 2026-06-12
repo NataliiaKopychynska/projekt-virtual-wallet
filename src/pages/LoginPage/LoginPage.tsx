@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { useTranslation } from '../../features/i18n/useTranslation'
 import loginBgDesktop from '../../images/backgrounds/login-bg-d.jpg'
 import loginBgTablet from '../../images/backgrounds/login-bg-t.jpg'
 import loginBgMobile from '../../images/backgrounds/register&login-bg-m.jpg'
@@ -8,6 +9,7 @@ import './LoginPage.css'
 
 const LoginPage = () => {
   const { user, isLoading, loginWithEmail, loginWithGoogle, resetPassword } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -27,7 +29,7 @@ const LoginPage = () => {
       await loginWithEmail(email, password)
       navigate('/home', { replace: true })
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Nie udało się zalogować.'
+      const message = err instanceof Error ? err.message : t('login.errorGeneric')
       setError(message)
     }
   }
@@ -39,7 +41,7 @@ const LoginPage = () => {
       await loginWithGoogle()
       navigate('/home', { replace: true })
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Nie udało się zalogować przez Google.'
+      const message = err instanceof Error ? err.message : t('login.errorGoogle')
       setError(message)
     }
   }
@@ -48,15 +50,15 @@ const LoginPage = () => {
     setError('')
     setInfo('')
     if (!email) {
-      setError('Podaj email, aby zresetować hasło.')
+      setError(t('login.errorEmailRequired'))
       return
     }
 
     try {
       await resetPassword(email)
-      setInfo('Wysłaliśmy email z linkiem do resetu hasła.')
+      setInfo(t('login.resetSent'))
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Nie udało się wysłać resetu hasła.'
+      const message = err instanceof Error ? err.message : t('login.errorResetFailed')
       setError(message)
     }
   }
@@ -77,16 +79,16 @@ const LoginPage = () => {
             <span className="login-page__logo-icon">◈</span>
           </div>
           <h1 className="login-page__title">Virtual Wallet</h1>
-          <p className="login-page__subtitle">Twój cyfrowy portfel</p>
+          <p className="login-page__subtitle">{t('appShell.tagline')}</p>
         </div>
 
         <div className="login-page__body">
-          <p className="login-page__welcome">Witaj z powrotem</p>
-          <p className="login-page__description">Zaloguj się, aby zarządzać swoimi finansami</p>
+          <p className="login-page__welcome">{t('login.welcome')}</p>
+          <p className="login-page__description">{t('login.description')}</p>
 
           <form className="login-page__form" onSubmit={handleEmailLogin}>
             <label className="login-page__field-label" htmlFor="email">
-              Email
+              {t('common.email')}
             </label>
             <input
               id="email"
@@ -94,13 +96,13 @@ const LoginPage = () => {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="twoj@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               autoComplete="email"
               required
             />
 
             <label className="login-page__field-label" htmlFor="password">
-              Hasło
+              {t('common.password')}
             </label>
             <input
               id="password"
@@ -108,7 +110,7 @@ const LoginPage = () => {
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Wpisz hasło"
+              placeholder={t('auth.passwordPlaceholder')}
               autoComplete="current-password"
               required
             />
@@ -119,7 +121,7 @@ const LoginPage = () => {
               onClick={handleForgotPassword}
               data-testid="forgot-password-button"
             >
-              Zapomniałem hasła
+              {t('login.forgot')}
             </button>
 
             <button
@@ -128,14 +130,14 @@ const LoginPage = () => {
               disabled={isLoading}
               data-testid="login-submit-button"
             >
-              Zaloguj
+              {t('login.submit')}
             </button>
           </form>
 
-          {isLoading && <div className="login-page__spinner" aria-label="Ładowanie..." />}
+          {isLoading && <div className="login-page__spinner" aria-label={t('common.loading')} />}
 
           <div className="login-page__divider">
-            <span>lub</span>
+            <span>{t('common.or')}</span>
           </div>
 
           <button
@@ -165,7 +167,7 @@ const LoginPage = () => {
                 />
               </svg>
             </span>
-            Zaloguj przez Google
+            {t('login.google')}
           </button>
 
           {error && (
@@ -180,9 +182,9 @@ const LoginPage = () => {
           )}
 
           <p className="login-page__register-prompt">
-            Nie masz jeszcze konta?{' '}
+            {t('login.noAccount')}{' '}
             <Link to="/register" className="login-page__register-link">
-              Zarejestruj się
+              {t('login.registerLink')}
             </Link>
           </p>
         </div>

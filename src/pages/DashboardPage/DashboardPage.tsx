@@ -4,6 +4,7 @@ import AppShell from '../../components/AppShell/AppShell'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePreferences } from '../../contexts/PreferencesContext'
 import { formatCurrencyValue } from '../../features/preferences/preferences'
+import { useTranslation } from '../../features/i18n/useTranslation'
 import { expenseCategories, incomeCategories } from '../../features/transactions/constants'
 import {
   formatAmount,
@@ -41,6 +42,7 @@ const getInitialFormState = (): TransactionFormState => ({
 const DashboardPage = () => {
   const { user } = useAuth()
   const { preferences } = usePreferences()
+  const { t, tCategory } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const routeState = location.state as { flashMessage?: string } | null
@@ -83,7 +85,7 @@ const DashboardPage = () => {
       },
       (error) => {
         console.error('Transactions subscription failed:', error)
-        setToastMessage('Nie udało się pobrać transakcji.')
+        setToastMessage(t('tx.fetchError'))
         setIsTransactionsLoading(false)
       },
     )
@@ -118,19 +120,19 @@ const DashboardPage = () => {
 
   const validateForm = () => {
     if (parseTransactionAmountToCents(formState.amount) === null) {
-      return 'Podaj poprawną kwotę większą od zera, maksymalnie z dwoma miejscami po przecinku.'
+      return t('tx.errorAmount')
     }
 
     if (!formState.transactionDate) {
-      return 'Wybierz datę transakcji.'
+      return t('tx.errorDate')
     }
 
     if (!formState.category.trim()) {
-      return 'Wybierz kategorię.'
+      return t('tx.errorCategory')
     }
 
     if (formState.comment.length > 100) {
-      return 'Komentarz może mieć maksymalnie 100 znaków.'
+      return t('tx.errorComment')
     }
 
     return ''
@@ -167,15 +169,15 @@ const DashboardPage = () => {
       const payload = buildPayload()
       if (editingId) {
         await updateTransaction(user.id, editingId, payload)
-        setToastMessage('Transakcja zaktualizowana.')
+        setToastMessage(t('tx.updated'))
       } else {
         await createTransaction(user.id, payload)
-        setToastMessage('Transakcja dodana.')
+        setToastMessage(t('tx.added'))
       }
       resetForm()
     } catch (error) {
       console.error('Saving transaction failed:', error)
-      setToastMessage('Nie udało się zapisać transakcji.')
+      setToastMessage(t('tx.saveError'))
     } finally {
       setIsSubmitting(false)
     }
@@ -195,23 +197,23 @@ const DashboardPage = () => {
 
   const handleDelete = async (txId: string) => {
     if (!user?.id) return
-    const isConfirmed = window.confirm('Czy na pewno chcesz usunąć tę transakcję?')
+    const isConfirmed = window.confirm(t('tx.confirmDelete'))
     if (!isConfirmed) return
 
     try {
       await deleteTransaction(user.id, txId)
-      setToastMessage('Transakcja usunięta.')
+      setToastMessage(t('tx.deleted'))
       if (editingId === txId) {
         resetForm()
       }
     } catch (error) {
       console.error('Deleting transaction failed:', error)
-      setToastMessage('Nie udało się usunąć transakcji.')
+      setToastMessage(t('tx.deleteError'))
     }
   }
 
   return (
-    <AppShell title="Pulpit" subtitle="Saldo, formularz transakcji i ostatnie ruchy na koncie.">
+    <AppShell title={t('nav.dashboard')} subtitle={t('dashboard.subtitle')}>
       <div className="dashboard-page" data-testid="dashboard-page">
         {toastMessage && (
           <div className="dashboard-page__flash-message" role="status" aria-live="polite">
@@ -229,7 +231,7 @@ const DashboardPage = () => {
 
         <section className="dashboard-page__balance-card">
           <div className="dashboard-page__balance-card-inner">
-            <p className="dashboard-page__balance-label">Saldo główne</p>
+            <p className="dashboard-page__balance-label">{t('dashboard.mainBalance')}</p>
             <p className="dashboard-page__balance-amount">
               {formatCurrencyValue(balance, preferences)}
             </p>
@@ -241,7 +243,7 @@ const DashboardPage = () => {
 
         <section className="dashboard-page__section">
           <h2 className="dashboard-page__section-title">
-            {editingId ? 'Edytuj transakcję' : 'Dodaj transakcję'}
+            {editingId ? t('tx.editTitle') : t('tx.addTitle')}
           </h2>
           <form
             className="dashboard-page__transaction-form"
@@ -249,7 +251,7 @@ const DashboardPage = () => {
             data-testid="transaction-form"
           >
             <label className="dashboard-page__field">
-              <span>Typ</span>
+              <span>{t('tx.type')}</span>
               <select
                 value={formState.type}
                 onChange={(event) =>
@@ -257,13 +259,13 @@ const DashboardPage = () => {
                 }
                 data-testid="transaction-type-select"
               >
-                <option value="expense">Wydatek</option>
-                <option value="income">Przychód</option>
+                <option value="expense">{t('tx.expense')}</option>
+                <option value="income">{t('tx.income')}</option>
               </select>
             </label>
 
             <label className="dashboard-page__field">
-              <span>Kwota ({preferences.currency})</span>
+              <span>{t('tx.amount', { currency: preferences.currency })}</span>
               <input
                 type="text"
                 inputMode="decimal"
@@ -271,13 +273,13 @@ const DashboardPage = () => {
                 onChange={(event) =>
                   setFormState((prev) => ({ ...prev, amount: event.target.value }))
                 }
-                placeholder="np. 54.99"
+                placeholder={t('tx.amountPlaceholder')}
                 data-testid="transaction-amount-input"
               />
             </label>
 
             <label className="dashboard-page__field">
-              <span>Kategoria</span>
+              <span>{t('tx.category')}</span>
               <select
                 value={formState.category}
                 onChange={(event) =>
@@ -287,14 +289,14 @@ const DashboardPage = () => {
               >
                 {categories.map((category) => (
                   <option key={category} value={category}>
-                    {category}
+                    {tCategory(category)}
                   </option>
                 ))}
               </select>
             </label>
 
             <label className="dashboard-page__field">
-              <span>Data</span>
+              <span>{t('tx.date')}</span>
               <input
                 type="date"
                 value={formState.transactionDate}
@@ -306,14 +308,14 @@ const DashboardPage = () => {
             </label>
 
             <label className="dashboard-page__field dashboard-page__field--full">
-              <span>Komentarz</span>
+              <span>{t('tx.comment')}</span>
               <input
                 type="text"
                 value={formState.comment}
                 onChange={(event) =>
                   setFormState((prev) => ({ ...prev, comment: event.target.value }))
                 }
-                placeholder="Opcjonalnie"
+                placeholder={t('tx.commentPlaceholder')}
                 maxLength={100}
                 data-testid="transaction-comment-input"
               />
@@ -332,7 +334,7 @@ const DashboardPage = () => {
                 disabled={isSubmitting}
                 data-testid="transaction-submit-button"
               >
-                {isSubmitting ? 'Zapisywanie...' : editingId ? 'Zapisz zmiany' : 'Dodaj transakcję'}
+                {isSubmitting ? t('common.saving') : editingId ? t('tx.saveChanges') : t('tx.addTitle')}
               </button>
               {editingId && (
                 <button
@@ -341,7 +343,7 @@ const DashboardPage = () => {
                   onClick={resetForm}
                   disabled={isSubmitting}
                 >
-                  Anuluj edycję
+                  {t('tx.cancelEdit')}
                 </button>
               )}
             </div>
@@ -350,19 +352,17 @@ const DashboardPage = () => {
 
         <section className="dashboard-page__section">
           <div className="dashboard-page__section-head">
-            <h2 className="dashboard-page__section-title">Ostatnie transakcje</h2>
+            <h2 className="dashboard-page__section-title">{t('dashboard.recent')}</h2>
             <Link to="/home/transactions" className="dashboard-page__section-link">
-              Zobacz wszystkie
+              {t('dashboard.seeAll')}
             </Link>
           </div>
 
           {isTransactionsLoading && (
-            <p className="dashboard-page__transactions-placeholder">Ładowanie...</p>
+            <p className="dashboard-page__transactions-placeholder">{t('common.loading')}</p>
           )}
           {!isTransactionsLoading && transactions.length === 0 && (
-            <p className="dashboard-page__transactions-placeholder">
-              Brak transakcji. Dodaj pierwszą transakcję powyżej.
-            </p>
+            <p className="dashboard-page__transactions-placeholder">{t('dashboard.empty')}</p>
           )}
           <ul className="dashboard-page__transactions" data-testid="recent-transactions">
             {recentTransactions.map((transaction) => (
@@ -378,9 +378,11 @@ const DashboardPage = () => {
                 </div>
                 <div className="dashboard-page__tx-info">
                   <span className="dashboard-page__tx-label">
-                    {transaction.comment || transaction.category}
+                    {transaction.comment || tCategory(transaction.category)}
                   </span>
-                  <span className="dashboard-page__tx-category">{transaction.category}</span>
+                  <span className="dashboard-page__tx-category">
+                    {tCategory(transaction.category)}
+                  </span>
                 </div>
                 <div className="dashboard-page__tx-right">
                   <span
@@ -402,14 +404,14 @@ const DashboardPage = () => {
                     className="dashboard-page__tx-action"
                     onClick={() => handleEdit(transaction)}
                   >
-                    Edytuj
+                    {t('common.edit')}
                   </button>
                   <button
                     type="button"
                     className="dashboard-page__tx-action dashboard-page__tx-action--danger"
                     onClick={() => void handleDelete(transaction.tId)}
                   >
-                    Usuń
+                    {t('common.delete')}
                   </button>
                 </div>
               </li>

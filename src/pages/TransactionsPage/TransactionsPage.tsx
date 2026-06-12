@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import AppShell from '../../components/AppShell/AppShell'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePreferences } from '../../contexts/PreferencesContext'
+import { useTranslation } from '../../features/i18n/useTranslation'
+import type { TranslationKey } from '../../features/i18n/translations'
 import {
   allTransactionCategories,
   transactionTypeOptions,
@@ -23,6 +25,12 @@ import './TransactionsPage.css'
 
 const PAGE_SIZE = 25
 
+const typeOptionKeys: Record<'all' | 'income' | 'expense', TranslationKey> = {
+  all: 'tx.allTypes',
+  income: 'tx.income',
+  expense: 'tx.expense',
+}
+
 const parseAmountInput = (value: string) => {
   if (!value.trim()) return null
   return parseCurrencyAmountToCents(value, { allowZero: true })
@@ -31,6 +39,7 @@ const parseAmountInput = (value: string) => {
 const TransactionsPage = () => {
   const { user } = useAuth()
   const { preferences } = usePreferences()
+  const { t, tCategory } = useTranslation()
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [type, setType] = useState<'all' | 'income' | 'expense'>('all')
@@ -84,7 +93,7 @@ const TransactionsPage = () => {
       setHasMore(result.hasMore)
     } catch (error) {
       console.error('Loading transactions page failed:', error)
-      setErrorMessage('Nie udało się pobrać transakcji. Spróbuj ponownie.')
+      setErrorMessage(t('txPage.fetchError'))
       if (mode === 'reset') {
         setTransactions([])
       }
@@ -134,7 +143,7 @@ const TransactionsPage = () => {
   const handleDeleteTransaction = async (transaction: Transaction) => {
     if (!user?.id || deletingId) return
 
-    const isConfirmed = window.confirm('Czy na pewno chcesz usunąć tę transakcję?')
+    const isConfirmed = window.confirm(t('tx.confirmDelete'))
     if (!isConfirmed) return
 
     setDeletingId(transaction.tId)
@@ -145,23 +154,20 @@ const TransactionsPage = () => {
       setTransactions((current) => current.filter((item) => item.tId !== transaction.tId))
     } catch (error) {
       console.error('Deleting transaction from history failed:', error)
-      setErrorMessage('Nie udało się usunąć transakcji. Spróbuj ponownie.')
+      setErrorMessage(t('txPage.deleteError'))
     } finally {
       setDeletingId(null)
     }
   }
 
   return (
-    <AppShell
-      title="Transakcje"
-      subtitle="Pełna historia operacji z filtrowaniem i doczytywaniem kolejnych rekordów."
-    >
+    <AppShell title={t('nav.transactions')} subtitle={t('txPage.subtitle')}>
       <div className="transactions-page" data-testid="transactions-page">
         <section className="transactions-page__filters" data-testid="transactions-filters">
           <div className="transactions-page__filters-head">
             <div>
-              <p className="transactions-page__eyebrow">Historia konta</p>
-              <h2 className="transactions-page__title">Wszystkie transakcje</h2>
+              <p className="transactions-page__eyebrow">{t('txPage.eyebrow')}</p>
+              <h2 className="transactions-page__title">{t('txPage.title')}</h2>
             </div>
             <button
               type="button"
@@ -169,13 +175,13 @@ const TransactionsPage = () => {
               onClick={handleResetFilters}
               data-testid="transactions-reset-filters"
             >
-              Resetuj filtry
+              {t('txPage.resetFilters')}
             </button>
           </div>
 
           <div className="transactions-page__filters-grid">
             <label className="transactions-page__field">
-              <span>Data od</span>
+              <span>{t('txPage.dateFrom')}</span>
               <input
                 type="date"
                 value={dateFrom}
@@ -183,7 +189,7 @@ const TransactionsPage = () => {
               />
             </label>
             <label className="transactions-page__field">
-              <span>Data do</span>
+              <span>{t('txPage.dateTo')}</span>
               <input
                 type="date"
                 value={dateTo}
@@ -191,38 +197,38 @@ const TransactionsPage = () => {
               />
             </label>
             <label className="transactions-page__field">
-              <span>Typ</span>
+              <span>{t('tx.type')}</span>
               <select value={type} onChange={(event) => setType(event.target.value as typeof type)}>
                 {transactionTypeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {t(typeOptionKeys[option.value])}
                   </option>
                 ))}
               </select>
             </label>
             <label className="transactions-page__field">
-              <span>Kategoria</span>
+              <span>{t('tx.category')}</span>
               <select value={category} onChange={(event) => setCategory(event.target.value)}>
-                <option value="">Wszystkie kategorie</option>
+                <option value="">{t('txPage.allCategories')}</option>
                 {allTransactionCategories.map((option) => (
                   <option key={option} value={option}>
-                    {option}
+                    {tCategory(option)}
                   </option>
                 ))}
               </select>
             </label>
             <label className="transactions-page__field transactions-page__field--wide">
-              <span>Szukaj po opisie</span>
+              <span>{t('txPage.searchLabel')}</span>
               <input
                 type="text"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="np. Lidl, pensja, Netflix"
+                placeholder={t('txPage.searchPlaceholder')}
                 data-testid="transactions-search-input"
               />
             </label>
             <label className="transactions-page__field">
-              <span>Kwota min ({preferences.currency})</span>
+              <span>{t('txPage.amountMin', { currency: preferences.currency })}</span>
               <input
                 type="text"
                 inputMode="decimal"
@@ -232,7 +238,7 @@ const TransactionsPage = () => {
               />
             </label>
             <label className="transactions-page__field">
-              <span>Kwota max ({preferences.currency})</span>
+              <span>{t('txPage.amountMax', { currency: preferences.currency })}</span>
               <input
                 type="text"
                 inputMode="decimal"
@@ -246,23 +252,25 @@ const TransactionsPage = () => {
 
         <section className="transactions-page__table-card" data-testid="transactions-results">
           <div className="transactions-page__table-head">
-            <span>{transactions.length} rekordów w aktualnym widoku</span>
+            <span>{t('txPage.recordCount', { count: transactions.length })}</span>
             {(dateFrom || dateTo) && (
               <span>
-                Zakres: {dateFrom ? toDateInputValue(new Date(`${dateFrom}T00:00:00`)) : '...'} -{' '}
-                {dateTo ? toDateInputValue(new Date(`${dateTo}T00:00:00`)) : '...'}
+                {t('txPage.range', {
+                  from: dateFrom ? toDateInputValue(new Date(`${dateFrom}T00:00:00`)) : '...',
+                  to: dateTo ? toDateInputValue(new Date(`${dateTo}T00:00:00`)) : '...',
+                })}
               </span>
             )}
           </div>
 
-          {isInitialLoading && <p className="transactions-page__status">Ładowanie transakcji...</p>}
+          {isInitialLoading && <p className="transactions-page__status">{t('txPage.loading')}</p>}
           {!isInitialLoading && errorMessage && (
             <p className="transactions-page__status transactions-page__status--error">
               {errorMessage}
             </p>
           )}
           {!isInitialLoading && !errorMessage && transactions.length === 0 && (
-            <p className="transactions-page__status">Brak wyników dla wybranych filtrów.</p>
+            <p className="transactions-page__status">{t('txPage.noResults')}</p>
           )}
 
           {transactions.length > 0 && (
@@ -271,12 +279,12 @@ const TransactionsPage = () => {
                 <table className="transactions-page__table">
                   <thead>
                     <tr>
-                      <th>Data transakcji</th>
-                      <th>Typ</th>
-                      <th>Kategoria</th>
-                      <th>Opis</th>
-                      <th>Kwota</th>
-                      <th>Akcje</th>
+                      <th>{t('txPage.colDate')}</th>
+                      <th>{t('tx.type')}</th>
+                      <th>{t('tx.category')}</th>
+                      <th>{t('txPage.colDesc')}</th>
+                      <th>{t('txPage.colAmount')}</th>
+                      <th>{t('txPage.colActions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -295,10 +303,10 @@ const TransactionsPage = () => {
                                 : 'transactions-page__type-pill--expense'
                             }`}
                           >
-                            {transaction.type === 'income' ? 'Przychód' : 'Wydatek'}
+                            {transaction.type === 'income' ? t('tx.income') : t('tx.expense')}
                           </span>
                         </td>
-                        <td>{transaction.category}</td>
+                        <td>{tCategory(transaction.category)}</td>
                         <td>{transaction.comment || '—'}</td>
                         <td
                           className={`transactions-page__amount ${
@@ -318,7 +326,7 @@ const TransactionsPage = () => {
                             disabled={deletingId === transaction.tId}
                             data-testid="transactions-delete-button"
                           >
-                            {deletingId === transaction.tId ? 'Usuwanie...' : 'Usuń'}
+                            {deletingId === transaction.tId ? t('txPage.deleting') : t('common.delete')}
                           </button>
                         </td>
                       </tr>
@@ -331,25 +339,27 @@ const TransactionsPage = () => {
                 {transactions.map((transaction) => (
                   <article key={transaction.tId} className="transactions-page__card">
                     <div className="transactions-page__card-row">
-                      <span>Data</span>
+                      <span>{t('tx.date')}</span>
                       <strong>
                         {formatTransactionDate(transaction.transactionDate, preferences)}
                       </strong>
                     </div>
                     <div className="transactions-page__card-row">
-                      <span>Typ</span>
-                      <strong>{transaction.type === 'income' ? 'Przychód' : 'Wydatek'}</strong>
+                      <span>{t('tx.type')}</span>
+                      <strong>
+                        {transaction.type === 'income' ? t('tx.income') : t('tx.expense')}
+                      </strong>
                     </div>
                     <div className="transactions-page__card-row">
-                      <span>Kategoria</span>
-                      <strong>{transaction.category}</strong>
+                      <span>{t('tx.category')}</span>
+                      <strong>{tCategory(transaction.category)}</strong>
                     </div>
                     <div className="transactions-page__card-row">
-                      <span>Opis</span>
+                      <span>{t('txPage.colDesc')}</span>
                       <strong>{transaction.comment || '—'}</strong>
                     </div>
                     <div className="transactions-page__card-row">
-                      <span>Kwota</span>
+                      <span>{t('txPage.colAmount')}</span>
                       <strong
                         className={
                           transaction.type === 'income'
@@ -368,7 +378,7 @@ const TransactionsPage = () => {
                       disabled={deletingId === transaction.tId}
                       data-testid="transactions-delete-button"
                     >
-                      {deletingId === transaction.tId ? 'Usuwanie...' : 'Usuń'}
+                      {deletingId === transaction.tId ? t('txPage.deleting') : t('common.delete')}
                     </button>
                   </article>
                 ))}
@@ -379,10 +389,10 @@ const TransactionsPage = () => {
           <div ref={sentinelRef} className="transactions-page__sentinel" aria-hidden="true" />
 
           {!isInitialLoading && transactions.length > 0 && isLoadingMore && (
-            <p className="transactions-page__status">Doczytywanie kolejnych transakcji...</p>
+            <p className="transactions-page__status">{t('txPage.loadingMore')}</p>
           )}
           {!isInitialLoading && transactions.length > 0 && !hasMore && (
-            <p className="transactions-page__status">To już cała historia dla bieżących filtrów.</p>
+            <p className="transactions-page__status">{t('txPage.endOfHistory')}</p>
           )}
         </section>
       </div>
